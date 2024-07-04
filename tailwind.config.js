@@ -1,7 +1,9 @@
 /** @type {import('tailwindcss').Config} */
-import daisyui from "daisyui";s
+import daisyui from "daisyui";
 export default {
-  content: [],
+  content: [
+    './resources/views/**/*.blade.php',
+  ],
   theme: {
     extend: {},
   },
