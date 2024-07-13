@@ -20,7 +20,7 @@ class LoginController extends Controller
     public function check(Request $request): RedirectResponse
     {
         //
-        $request->validate([]);
+        // $request->validate([]);
 
         if(Auth::attempt(['email' => $request->email, 'password' => $request->password]))
         {
@@ -30,10 +30,10 @@ class LoginController extends Controller
         return back()->with('status', 'Credenciales invalidas!');
     }
 
-    public function logout(): RedirectResponse
+    public function logout(Request $request): RedirectResponse
     {
         Auth::logout();
-        //TODO: invalidar token de sessión
+        $request->session()->regenerateToken();
         return to_route('inicio');
     }
 }

@@ -8,17 +8,25 @@ use App\Http\Controllers\MultimediaController;
 
 Route::get('/', function () {
     return view('inicio');
-});
+})->name('inicio');
 
-Route::get('ingresar', [LoginController::class, 'login'])->name('login.view');
+Route::get('ingresar', [LoginController::class, 'login'])->name('login');
 Route::post('login', [LoginController::class, 'check'])->name('login.check');
 
 // Zona para autenticados
 
-// Inicio
-Route::get('inicio', [HomeController::class, 'inicio'])->name('inicio');
+Route::middleware('auth')->group(function (){
 
-// Reporte
-Route::resource('reporte', ReportController::class);
-// Multimedia
-Route::resource('multimedia', MultimediaController::class);
+    // Inicio
+    Route::get('inicio', [HomeController::class, 'inicio'])->name('home');
+    
+    // Reporte
+    Route::resource('reporte', ReportController::class);
+
+    // Multimedia
+    Route::resource('multimedia', MultimediaController::class);
+
+    // Cerrar sesión
+    Route::get('salir', [LoginController::class, 'logout'])->name('logout');
+
+});
