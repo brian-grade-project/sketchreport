@@ -14,6 +14,7 @@
         <table class="table table-zebra border">
             <thead>
                 <tr>
+                    <th>Titulo</th>
                     <th>Contenido</th>
                     <th>Archivos adjuntos</th>
                     <th>Ultima edición</th>
@@ -23,6 +24,7 @@
                 @if($reportes->count())
                   @foreach($reportes as $reporte)
                     <tr>
+                        <td>{{ $reporte->title }}</td>
                         <td>{{ $reporte->text }}</td>
                         <td>{{ $reporte->multimedias->count() }}</td>
                         <td>{{ $reporte->updated_at }}</td>
