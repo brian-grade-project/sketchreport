@@ -14,7 +14,6 @@ return new class extends Migration
         Schema::create('reports', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id');
-            $table->unsignedBigInteger('mutimedia_id');
             $table->string('title');
             $table->text('text');
             $table->timestamps();

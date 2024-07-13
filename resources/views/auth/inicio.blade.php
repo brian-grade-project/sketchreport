@@ -8,8 +8,8 @@
     <div class="w-1/2 px-2 border-r">
         <h1 class="text-2xl py-4">Ultimos reportes realizados</h1>
         <div class="flex justify-between py-4">
-            <a href="{{ route('reporte.create') }}" class="btn btn-sm btn-primary">Crear reporte</a>
-            <a href="{{ route('reporte.index') }}" class="btn btn-sm btn-primary">Todos los reportes</a>
+            <a href="{{ route('reporte.create') }}" class="btn btn-sm bg-orange-600 active:opacity-50 text-zinc-800">Crear reporte</a>
+            <a href="{{ route('reporte.index') }}" class="btn btn-sm bg-orange-600 active:opacity-50 text-zinc-800">Todos los reportes</a>
         </div>
         <table class="table table-zebra border">
             <thead>
@@ -42,8 +42,8 @@
     <div class="w-1/2 px-2">
         <h1 class="text-2xl py-4">Ultimos Archivos de medios agregados</h1>
         <div class="flex justify-between py-4">
-            <a href="{{ route('multimedia.create') }}" class="btn btn-sm btn-primary">Crear reporte</a>
-            <a href="{{ route('multimedia.index') }}" class="btn btn-sm btn-primary">Todos los reportes</a>
+            <a href="{{ route('multimedia.create') }}" class="btn btn-sm bg-orange-600 active:opacity-50 text-zinc-800">Agregar archivo de medios</a>
+            <a href="{{ route('multimedia.index') }}" class="btn btn-sm bg-orange-600 active:opacity-50 text-zinc-800">Todos los archivos de medios</a>
         </div>
         <table class="table table-zebra border">
             <thead>

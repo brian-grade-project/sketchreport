@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('multimedias', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('report_id')->nullable();
             $table->string('path');
             $table->string('type');
             $table->text('text');

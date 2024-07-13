@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Report;
 use Illuminate\Http\Request;
 
 class ReportController extends Controller
@@ -12,6 +13,9 @@ class ReportController extends Controller
     public function index()
     {
         //
+        $reportes = Report::paginate(15);
+
+        return view('report.index', compact('reportes'));
     }
 
     /**
@@ -20,6 +24,7 @@ class ReportController extends Controller
     public function create()
     {
         //
+        return view('report.create');
     }
 
     /**
@@ -28,12 +33,14 @@ class ReportController extends Controller
     public function store(Request $request)
     {
         //
+        $report = new Report();
+        
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Report $report)
     {
         //
     }
@@ -41,7 +48,7 @@ class ReportController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Report $report)
     {
         //
     }
@@ -49,7 +56,7 @@ class ReportController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Report $report)
     {
         //
     }
@@ -57,7 +64,7 @@ class ReportController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Report $report)
     {
         //
     }

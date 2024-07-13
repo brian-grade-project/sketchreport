@@ -12,6 +12,6 @@ class Report extends Model
 
     public function multimedias(): HasMany
     {
-        return $this->hasMany(Multimedia::class, 'multimedia_id');
+        return $this->hasMany(Multimedia::class, 'report_id');
     }
 }
