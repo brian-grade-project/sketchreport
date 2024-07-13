@@ -1,7 +1,8 @@
-git<?php
+<?php
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\MultimediaController;
 
@@ -13,6 +14,9 @@ Route::get('ingresar', [LoginController::class, 'login'])->name('login.view');
 Route::post('login', [LoginController::class, 'check'])->name('login.check');
 
 // Zona para autenticados
+
+// Inicio
+Route::get('inicio', [HomeController::class, 'inicio'])->name('inicio');
 
 // Reporte
 Route::resource('reporte', ReportController::class);

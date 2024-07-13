@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html data-theme="lofi">
     <head>
         <title>@yield('title', 'Bienvenido')</title>
         <link rel="stylesheet" href="{{ asset('css/app.css') }}">
@@ -8,7 +8,7 @@
     </head>
     <body>
         @include('layout.header')
-        <main>
+        <main class="p-2">
             @include('layout.sidebar')
             @yield('content')
         </main>
