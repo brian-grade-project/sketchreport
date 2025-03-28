@@ -1,12 +1,13 @@
 @extends('layout.master')
 
 @section('content')
+
 <div class="w-[100vw] h-[100vh]">
     <div class="w-[80%] h-3/4 bg-zinc-800 m-auto mt-5 relative overflow-hidden rounded-3xl ">
 
-    <form class=" flex flex-row flex-auto flex-wrap relative float-left lg:w-[62%] md:w-[60%]">
+    <form class=" flex flex-row flex-auto flex-wrap relative float-left w-[62%]">
 
-            <div class=" relative ml-16 lg:w-60 md:w-[48%] ">
+            <div class=" relative ml-16 w-60 ">
 
                 <label for="titulo" class="text-xl text-orange-600 block ml-5 mt-10 font-light">Titulo de reporte</label>
                 <input type="text" class="bg-white rounded-full w-full p-1 " name="titulo" id="titulo" placeholder="Ingrese titulo">
@@ -39,20 +40,15 @@
 
             </div>
 
-            <div class="relative w-[100%] flex flex-row">
-                <div class="relative block  mt-10 ml-16 lg:w-[25%] md:w-[25%] rounded-full ">
-                    <button class="btn-sm text-center bg-orange-600 w-full rounded-full text-xl font-light h-full hover:bg-orange-700 hover:text-white hover:font-semibold  ">Guardar</button>
-
-                </div>
-
-                <div class="relative block  mt-10 ml-16 lg:w-[45%] md:w-[45%] rounded-full  ">
-                    <button class="btn-sm text-center bg-orange-600 w-full rounded-full text-xl font-light h-full hover:bg-orange-700 hover:text-white hover:font-semibold  ">Guardar y Exportar</button>
-
-                </div>
+            <div class="relative block  mt-10 ml-16 w-[25%] rounded-full h-full ">
+                <button class="btn-sm text-center bg-orange-600 w-full rounded-full text-xl font-light h-full hover:bg-orange-700 hover:text-white hover:font-semibold  ">Guardar</button>
 
             </div>
 
-            
+            <div class="relative block  mt-10 ml-16 w-[35%] rounded-full h-full ">
+                <button class="btn-sm text-center bg-orange-600 w-full rounded-full text-xl font-light h-full hover:bg-orange-700 hover:text-white hover:font-semibold  ">Guardar y Exportar</button>
+
+            </div>
     </form>   
 
 
@@ -107,9 +103,7 @@
 
         
 -->
-        <div class="bg-orange-600 w-2/6 h-screen float-right overflow-clip relative m-0 p-0">
-            <div class="w-[30%] h-[30%] bg-zinc-800 absolute"></div>
-            <div class="w-[60%] h-[100%] bg-zinc-800 rotate-45 relative top-60 right-0 left-28  "></div>
+        <div class="bg-orange-600 w-2/6 h-screen float-right">
             
         </div>
     </div>
