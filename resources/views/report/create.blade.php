@@ -108,7 +108,11 @@
         
 -->
         <div class="bg-orange-600 w-2/6 h-screen float-right overflow-clip relative m-0 p-0">
-            <div class="w-[30%] h-[30%] bg-zinc-800 absolute"></div>
+            
+            <div class="xl:w-[45%] xl:h-[25%] lg:w-[45%] lg:h-[23%] md:w-[45%] md:h-[17%] bg-zinc-800 absolute rounded-full ml-[30%] mt-[20%]">
+                <img src="/img/file-import.svg" alt="file_import" class="stroke-orange-600 stroke-4 m-auto mt-2 w-[80%] " >
+            </div>
+
             <div class="w-[60%] h-[100%] bg-zinc-800 rotate-45 relative top-60 right-0 left-28  "></div>
             
         </div>

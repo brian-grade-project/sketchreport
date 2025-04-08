@@ -7,8 +7,8 @@
         <script src="https://cdn.tailwindcss.com"></script>
     </head>
     <body>
-        @include('layout.header')
-        <main class="p-2">
+        
+        <main class="">
             @include('layout.sidebar')
             @yield('content')
         </main>
