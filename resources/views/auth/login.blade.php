@@ -32,10 +32,10 @@
             <form action="{{ route('login.check') }}" method="post">
                 @csrf
                 <label class="text-xl md:text-lg text-orange-600 block ml-28 md:ml-[25%] mt-8 font-light" for="usuario">Usuario</label>
-                <input name="email" class="bg-white text-orange-600  rounded-full w-7/12 m-auto ml-24 md:ml-[22%]  p-1 focus:bg-orange-600 text-yellow-800" type="text" placeholder="Ingrese usuario" id="usuario">
+                <input name="email" class="bg-white   rounded-full w-7/12 m-auto ml-24 md:ml-[22%]  p-1 focus:bg-orange-600 focus:text-white text-yellow-800" type="text" placeholder="Ingrese usuario" id="usuario">
 
                 <label class="text-xl md:text-lg text-orange-600 block ml-28 md:ml-[25%] mt-5 font-light" for="contraseña">Contraseña</label>
-                <input name="password" class="bg-white text-orange-600  rounded-full w-7/12 m-auto ml-24 md:ml-[22%] md:mb-[5%] p-1 focus:bg-orange-600 text-zinc-800" type="password" placeholder="Ingrese contraseña" id="contraseña">
+                <input name="password" class="bg-white rounded-full w-7/12 m-auto ml-24 md:ml-[22%] md:mb-[5%] p-1 focus:bg-orange-600 focus:text-white text-yellow-800" type="password" placeholder="Ingrese contraseña" id="contraseña">
 
                 <a class="text-orange-600 underline font-light m-auto ml-36 md:ml-[22%] lg:ml-[29%] xl:ml-[34%] mt-5 md:mt-[70%]" href="#">¿Olvidaste tu contraseña?</a>
                 <input class="text-orange-600 text-lg font-bold bg-zinc-800 border-2 border-orange-600 rounded-full  block m-auto ml-24 md:ml-[23%] mt-5 md:mt-[8%] lg:mt-[5%] p-1 italic hover:bg-orange-600 hover:text-zinc-800 hover:transition-all duration-500 ease-in-out hover w-7/12 " type="submit" value="Ingresar">

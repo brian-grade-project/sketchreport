@@ -18,7 +18,11 @@
 <div class="w-[100vw] h-[100vh] bg-[url(/img/imglogin.jpg)] bg-no-repeat bg-cover pt-5 relative" >
     <div class= "bg-black/20 backdrop-blur-sm w-[100vw]  absolute inset-0 z-0"></div>
 
-    <div class="w-[80%] md:w-[90%] h-[60%] bg-orange-600 m-auto mt-5 p-8 rounded-xl relative shadow-xl">
+    <div class="w-[80%] md:w-[90%] h-[60%] bg-orange-600 m-auto mt-5 p-8 pt-3 rounded-xl relative shadow-xl">
+
+      <div class=" w-[15%] h-[10%] md:h-[5%]  mb-5 md:mb-5 lg:mb-7 lg:mt-1 xl:mb-10 xl:w-[14%] 2xl:mb-12">
+          <svg class="w-[30%] fill-zinc-800 hover:bg-zinc-800 hover:fill-orange-600 transition-all duration-500 ease-in-out rounded-full" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g id="arrow-left"><path d="M11,18.75a.74.74,0,0,1-.53-.22l-6-6a.75.75,0,0,1,0-1.06l6-6a.75.75,0,0,1,1.06,1.06L6.06,12l5.47,5.47a.75.75,0,0,1,0,1.06A.74.74,0,0,1,11,18.75Z"/><path d="M19,12.75H5a.75.75,0,0,1,0-1.5H19a.75.75,0,0,1,0,1.5Z"/></g></svg>
+      </div>
 
       <div class="mb-2 relative bg-zinc-700 rounded-md w-[100%] p-5">
         <h1 class="text-2xl md:text-base xl:text-3xl lg:text-lg  ml-4 md:ml-1 md:mr-2 mr-4 lg:mr-2 font-semibold inline-block text-zinc-800 bg-orange-600 p-1 px-4 rounded-full">Lista de Reportes</h1>
