@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\MultimediaController;
+use App\Http\Controllers\ProfileController;
 
 Route::get('/', function () {
     return view('inicio');
@@ -25,6 +26,9 @@ Route::middleware('auth')->group(function (){
 
     // Multimedia
     Route::resource('multimedia', MultimediaController::class);
+
+    // Perfil
+    Route::get('perfil', [ProfileController::class, 'show'])->name('profile.show');
 
     // Cerrar sesión
     Route::get('salir', [LoginController::class, 'logout'])->name('logout');

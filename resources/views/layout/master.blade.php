@@ -6,8 +6,8 @@
         <link href="{{ asset('css/daisyui.min.css') }}" rel="stylesheet" type="text/css" >
         <script src="{{ asset('js/cdn.tailwindcss.com.js') }}"></script>
     </head>
-    <body>
-        
+    <body> 
+        @include('layout.header')
         <main class="">
             @include('layout.sidebar')
             @yield('content')
