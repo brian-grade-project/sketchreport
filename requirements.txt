@@ -1,0 +1,97 @@
+# SketchReport - Sistema de Gestión de Reportes y Multimedia
+
+## Descripción
+SketchReport es una aplicación web desarrollada en Laravel que permite gestionar reportes y archivos multimedia de manera eficiente. El sistema cuenta con una interfaz moderna y responsiva construida con Tailwind CSS.
+
+## Características Implementadas
+- Sistema de autenticación de usuarios
+- Gestión de reportes (CRUD)
+- Gestión de archivos multimedia
+- Interfaz de usuario moderna y responsiva
+- Dashboard con vista de últimos reportes y archivos multimedia
+- Perfil de usuario con gestión de información personal
+- Sistema de suscripciones
+
+## Requisitos del Sistema
+- PHP >= 8.1
+- Composer
+- Node.js y NPM
+- MySQL/MariaDB
+- Servidor web (Apache/Nginx)
+
+## Pendientes por Implementar
+
+### Funcionalidades
+1. Gestión de Multimedia
+   - [x] Implementar validación de archivos multimedia
+   - Agregar soporte para diferentes tipos de archivos
+   - Implementar vista previa de archivos multimedia
+   - Completar funcionalidad de exportación de archivos
+
+2. Sistema de Reportes
+   - Implementar filtros avanzados en la lista de reportes
+   - Agregar funcionalidad de búsqueda
+   - Implementar sistema de categorías para reportes
+   - Agregar funcionalidad de compartir reportes
+
+3. Perfil de Usuario
+   - Implementar cambio de contraseña
+   - Agregar validación de campos del perfil
+   - Implementar subida de foto de perfil
+   - Agregar historial de actividades
+
+4. Sistema de Suscripciones
+   - Implementar diferentes planes de suscripción
+   - Agregar sistema de pagos
+   - Implementar renovación automática
+   - Agregar notificaciones de vencimiento
+
+5. Seguridad
+   - Implementar autenticación de dos factores
+   - Agregar registro de actividad de usuarios
+   - Implementar políticas de contraseñas
+   - Agregar sistema de recuperación de contraseña
+
+6. Interfaz de Usuario
+   - Mejorar la responsividad en dispositivos móviles
+   - Implementar temas oscuro/claro
+   - Agregar animaciones y transiciones
+   - Mejorar la accesibilidad
+
+### Correcciones Técnicas
+1. Base de Datos
+   - Optimizar índices de tablas
+   - Implementar soft deletes
+   - Agregar relaciones faltantes
+   - Implementar caché de consultas frecuentes
+
+2. Backend
+   - Implementar validación de datos
+   - Agregar manejo de errores
+   - Implementar logs del sistema
+   - Optimizar consultas a la base de datos
+
+3. Frontend
+   - Implementar lazy loading de imágenes
+   - Optimizar carga de assets
+   - Implementar PWA
+   - Mejorar SEO
+
+## Prioridades de Implementación
+1. Alta Prioridad
+   - [x] Implementar validación de archivos multimedia
+   - Completar funcionalidad de cambio de contraseña
+   - Implementar filtros y búsqueda en reportes
+   - Agregar manejo de errores y validación de datos
+
+2. Media Prioridad
+   - Implementar sistema de categorías para reportes
+   - Agregar sistema de pagos para suscripciones
+   - Mejorar la responsividad en dispositivos móviles
+   - Implementar logs del sistema
+
+3. Baja Prioridad
+   - Implementar temas oscuro/claro
+   - Agregar animaciones y transiciones
+   - Implementar PWA
+   - Mejorar SEO 

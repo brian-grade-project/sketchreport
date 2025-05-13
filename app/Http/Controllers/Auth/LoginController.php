@@ -11,7 +11,6 @@ use App\Models\User;
 
 class LoginController extends Controller
 {
-    //
     public function login(): View
     {
         return view('auth.login');
@@ -19,21 +18,28 @@ class LoginController extends Controller
 
     public function check(Request $request): RedirectResponse
     {
-        //
-        // $request->validate([]);
+        $credentials = $request->validate([
+            'email' => ['required', 'email'],
+            'password' => ['required'],
+        ]);
 
-        if(Auth::attempt(['email' => $request->email, 'password' => $request->password]))
-        {
-            return to_route('home');
+        if (Auth::attempt($credentials, $request->boolean('remember'))) {
+            $request->session()->regenerate();
+            return redirect()->intended(route('home'));
         }
 
-        return back()->with('status', 'Credenciales invalidas!');
+        return back()
+            ->withInput($request->only('email'))
+            ->withErrors([
+                'email' => 'Las credenciales proporcionadas no coinciden con nuestros registros.',
+            ]);
     }
 
     public function logout(Request $request): RedirectResponse
     {
         Auth::logout();
+        $request->session()->invalidate();
         $request->session()->regenerateToken();
-        return to_route('inicio');
+        return redirect()->route('inicio');
     }
 }

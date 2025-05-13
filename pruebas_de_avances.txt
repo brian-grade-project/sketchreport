@@ -1,0 +1,413 @@
+# PRUEBAS DE AVANCES - SKETCHREPORT
+
+## Avance 1: Implementación de Validación de Archivos Multimedia
+Fecha: [Fecha actual]
+
+### Descripción del Avance
+Se ha implementado la validación de archivos multimedia en el sistema, permitiendo la subida de diferentes tipos de archivos (imágenes, videos, audio y documentos) con validaciones específicas para cada tipo.
+
+### Tipos de Archivos Permitidos
+- Imágenes: JPEG, PNG, GIF, WebP
+- Videos: MP4, QuickTime, AVI, WMV
+- Audio: MP3, WAV, OGG, MIDI
+- Documentos: PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX, TXT
+
+### Límites y Restricciones
+- Tamaño máximo por archivo: 100MB
+- Campos requeridos: título y fecha
+- Validación de tipos MIME para seguridad
+
+### Instrucciones para Probar
+
+1. Acceso al Sistema
+   - Iniciar sesión en la aplicación usando la ruta `/ingresar`
+   - Una vez autenticado, acceder a la URL `/test-upload`
+
+2. Prueba de Subida de Archivos
+   a) Subir archivos válidos:
+      - Seleccionar una imagen (JPG o PNG)
+      - Seleccionar un video (MP4)
+      - Seleccionar un documento (PDF)
+      - Seleccionar un archivo de audio (MP3)
+      - Completar el título y la fecha
+      - Hacer clic en "Probar Subida"
+
+   b) Probar validaciones:
+      - Intentar subir un archivo muy grande (>100MB)
+      - Intentar subir un archivo con extensión no permitida
+      - Intentar subir sin seleccionar archivos
+      - Intentar subir sin título o fecha
+
+3. Verificación de Resultados
+   - Los resultados se mostrarán en la sección inferior de la página
+   - Para cada archivo procesado, se mostrará:
+     * Nombre original del archivo
+     * Tipo MIME detectado
+     * Tamaño en bytes y MB
+     * Extensión del archivo
+     * Tipo detectado (imagen, video, audio o documento)
+
+4. Casos de Éxito Esperados
+   - Subida exitosa de archivos válidos
+   - Mensaje de éxito con detalles de los archivos
+   - Clasificación correcta del tipo de archivo
+
+5. Casos de Error Esperados
+   - Mensaje de error para archivos muy grandes
+   - Mensaje de error para tipos de archivo no permitidos
+   - Mensaje de error para campos requeridos faltantes
+
+### Notas Adicionales
+- La validación se realiza tanto en el frontend como en el backend
+- Los archivos no se guardan permanentemente durante las pruebas
+- Se puede probar la subida de múltiples archivos simultáneamente
+
+## Avance 2: Implementación de Soporte para Diferentes Tipos de Archivos
+Fecha: [Fecha actual]
+
+### Descripción del Avance
+Se ha implementado un sistema completo de procesamiento de archivos multimedia que incluye:
+- Procesamiento específico para cada tipo de archivo
+- Generación de miniaturas para imágenes y videos
+- Almacenamiento organizado por tipo y fecha
+- Metadatos específicos para cada tipo de archivo
+
+### Características Implementadas
+1. Procesamiento de Imágenes
+   - Redimensionamiento automático
+   - Generación de miniaturas
+   - Preservación de la relación de aspecto
+   - Almacenamiento en directorio específico
+
+2. Procesamiento de Videos
+   - Extracción de miniaturas automática
+   - Almacenamiento en directorio específico
+   - Captura de metadatos (duración, formato)
+
+3. Procesamiento de Audio
+   - Almacenamiento en directorio específico
+   - Captura de metadatos (duración, formato)
+
+4. Procesamiento de Documentos
+   - Almacenamiento en directorio específico
+   - Captura de metadatos (tamaño, tipo)
+
+### Instrucciones para Probar
+
+1. Preparación
+   - Ejecutar `composer install` para instalar nuevas dependencias
+   - Ejecutar `php artisan migrate` para actualizar la base de datos
+   - Asegurarse de que FFmpeg esté instalado en el sistema
+
+2. Prueba de Procesamiento de Imágenes
+   - Subir una imagen de alta resolución
+   - Verificar que se genere una miniatura
+   - Comprobar que la imagen original mantiene su calidad
+   - Verificar los metadatos (dimensiones, tipo)
+
+3. Prueba de Procesamiento de Videos
+   - Subir un video
+   - Verificar que se genere una miniatura
+   - Comprobar que el video se reproduce correctamente
+   - Verificar los metadatos (duración, formato)
+
+4. Prueba de Procesamiento de Audio
+   - Subir un archivo de audio
+   - Verificar que se almacene correctamente
+   - Comprobar que se puede reproducir
+   - Verificar los metadatos (duración, formato)
+
+5. Prueba de Procesamiento de Documentos
+   - Subir diferentes tipos de documentos
+   - Verificar que se almacenen correctamente
+   - Comprobar que se pueden descargar
+   - Verificar los metadatos (tamaño, tipo)
+
+### Verificación de Resultados
+- Los archivos deben estar organizados en directorios por tipo y fecha
+- Cada archivo debe tener sus metadatos correspondientes
+- Las miniaturas deben generarse correctamente
+- Los archivos originales deben mantener su calidad
+
+### Notas Adicionales
+- Se requiere FFmpeg instalado para el procesamiento de videos
+- Las miniaturas de imágenes se generan con un tamaño máximo de 300x300 píxeles
+- Los metadatos se almacenan en formato JSON en la base de datos
+- Se implementó soft delete para preservar los archivos en caso de eliminación accidental
+
+### Siguiente Paso
+Implementar la vista previa de archivos multimedia en la interfaz de usuario.
+
+## Avance 3: Implementación de Vista Previa de Archivos Multimedia
+Fecha: [Fecha actual]
+
+### Descripción del Avance
+Se ha implementado una interfaz de usuario mejorada para la carga de archivos multimedia que incluye una vista previa en tiempo real de los archivos seleccionados. La implementación permite una experiencia de usuario más intuitiva y visual al cargar archivos.
+
+### Características Implementadas
+
+1. Interfaz de Usuario Mejorada
+   - Zona de arrastrar y soltar con efectos visuales
+   - Vista previa en tiempo real de archivos seleccionados
+   - Diseño responsivo que se adapta a diferentes tamaños de pantalla
+   - Feedback visual durante la interacción
+
+2. Previsualización de Archivos
+   - Imágenes: Visualización directa con tamaño uniforme
+   - Videos: Reproducción con controles nativos
+   - Audio: Reproductor con controles nativos
+   - Documentos: Icono representativo con nombre del archivo
+
+3. Funcionalidades de Interacción
+   - Arrastrar y soltar archivos
+   - Selección múltiple de archivos
+   - Validación de tipos de archivo permitidos
+   - Envío asíncrono del formulario
+
+### Instrucciones para Probar
+
+1. Acceso a la Interfaz
+   - Navegar a la página de carga de multimedia
+   - Verificar que la zona de arrastrar y soltar esté visible
+   - Comprobar que el botón de selección de archivos funcione
+
+2. Prueba de Carga de Archivos
+   a) Método de arrastrar y soltar:
+      - Seleccionar un archivo del sistema
+      - Arrastrarlo sobre la zona punteada
+      - Verificar el efecto de resaltado
+      - Soltar el archivo y comprobar la vista previa
+
+   b) Método de selección directa:
+      - Hacer clic en el botón de selección de archivos
+      - Seleccionar uno o varios archivos
+      - Verificar que aparezcan las vistas previas
+
+3. Prueba de Vista Previa
+   a) Imágenes:
+      - Subir una imagen JPG o PNG
+      - Verificar que se muestre la previsualización
+      - Comprobar que mantiene la proporción de aspecto
+
+   b) Videos:
+      - Subir un video MP4
+      - Verificar que se muestre el reproductor
+      - Comprobar que los controles funcionan
+
+   c) Audio:
+      - Subir un archivo MP3
+      - Verificar que se muestre el reproductor
+      - Comprobar que los controles funcionan
+
+   d) Documentos:
+      - Subir un PDF o documento
+      - Verificar que se muestre el icono
+      - Comprobar que se muestra el nombre del archivo
+
+4. Prueba de Envío
+   - Seleccionar varios archivos de diferentes tipos
+   - Completar el título y la fecha
+   - Hacer clic en "Guardar"
+   - Verificar el mensaje de éxito/error
+   - Comprobar que la vista previa se limpia después del envío exitoso
+
+### Casos de Éxito Esperados
+- Visualización correcta de todos los tipos de archivo
+- Funcionamiento fluido del arrastrar y soltar
+- Actualización en tiempo real de la vista previa
+- Envío exitoso de los archivos
+- Limpieza de la vista previa después del envío
+
+### Casos de Error Esperados
+- Mensaje de error para tipos de archivo no permitidos
+- Mensaje de error para archivos muy grandes
+- Mensaje de error para campos requeridos faltantes
+- Mensaje de error en caso de fallo en la subida
+
+### Notas Adicionales
+- La interfaz es completamente responsiva
+- Se mantiene la estética y el diseño original del proyecto
+- La vista previa se actualiza en tiempo real
+- Se implementó manejo de errores asíncrono
+- Se agregaron efectos visuales para mejorar la experiencia de usuario
+
+### Siguiente Paso
+Implementar la funcionalidad de edición y eliminación de archivos en la vista previa.
+
+## Avance 4: Implementación de Vista Previa en Vistas de Reportes y Multimedia
+Fecha: [Fecha actual]
+
+### Descripción del Avance
+Se ha implementado la funcionalidad de vista previa de archivos multimedia tanto en la vista de creación de reportes como en la vista de multimedia. Esta implementación proporciona una experiencia de usuario consistente y mejorada para la carga de archivos en ambas secciones del sistema.
+
+### Características Implementadas en Ambas Vistas
+
+1. Interfaz de Usuario Unificada
+   - Zona de arrastrar y soltar con efectos visuales
+   - Vista previa en tiempo real de archivos seleccionados
+   - Diseño responsivo adaptado a diferentes tamaños de pantalla
+   - Feedback visual durante la interacción
+
+2. Previsualización de Archivos
+   - Imágenes: Visualización directa con tamaño uniforme
+   - Videos: Reproducción con controles nativos
+   - Audio: Reproductor con controles nativos
+   - Documentos: Icono representativo con nombre del archivo
+
+3. Funcionalidades de Interacción
+   - Arrastrar y soltar archivos
+   - Selección múltiple de archivos
+   - Validación de tipos de archivo permitidos
+   - Envío asíncrono del formulario
+
+### Diferencias entre las Vistas
+
+1. Vista de Reportes (`report/create.blade.php`)
+   - Incluye campos adicionales:
+     * Título del reporte
+     * Fecha
+     * Cuerpo del reporte
+   - Envío de formulario a la ruta `/reports`
+   - Mensajes de éxito/error específicos para reportes
+
+2. Vista de Multimedia (`multimedia/create.blade.php`)
+   - Enfoque específico en la carga de archivos
+   - Envío de formulario a la ruta `/test-upload`
+   - Mensajes de éxito/error específicos para multimedia
+
+### Instrucciones para Probar
+
+1. Prueba en Vista de Reportes
+   a) Acceso:
+      - Navegar a la página de creación de reportes
+      - Verificar que todos los campos estén presentes
+      - Comprobar la zona de arrastrar y soltar
+
+   b) Carga de Archivos:
+      - Probar el arrastrar y soltar
+      - Probar la selección directa de archivos
+      - Verificar la vista previa de diferentes tipos de archivo
+
+   c) Envío del Reporte:
+      - Completar todos los campos requeridos
+      - Subir archivos multimedia
+      - Verificar el envío exitoso
+      - Comprobar la limpieza del formulario
+
+2. Prueba en Vista de Multimedia
+   a) Acceso:
+      - Navegar a la página de multimedia
+      - Verificar la zona de arrastrar y soltar
+      - Comprobar el botón de selección de archivos
+
+   b) Carga de Archivos:
+      - Probar el arrastrar y soltar
+      - Probar la selección directa de archivos
+      - Verificar la vista previa de diferentes tipos de archivo
+
+   c) Envío de Multimedia:
+      - Subir archivos multimedia
+      - Verificar el envío exitoso
+      - Comprobar la limpieza del formulario
+
+### Casos de Éxito Esperados
+- Visualización correcta de todos los tipos de archivo en ambas vistas
+- Funcionamiento fluido del arrastrar y soltar
+- Actualización en tiempo real de la vista previa
+- Envío exitoso de los formularios
+- Limpieza de la vista previa después del envío exitoso
+
+### Casos de Error Esperados
+- Mensaje de error para tipos de archivo no permitidos
+- Mensaje de error para archivos muy grandes
+- Mensaje de error para campos requeridos faltantes
+- Mensaje de error en caso de fallo en la subida
+
+### Notas Adicionales
+- La interfaz es completamente responsiva en ambas vistas
+- Se mantiene la estética y el diseño original del proyecto
+- La vista previa se actualiza en tiempo real
+- Se implementó manejo de errores asíncrono
+- Se agregaron efectos visuales para mejorar la experiencia de usuario
+
+### Siguiente Paso
+Implementar la funcionalidad de edición y eliminación de archivos en la vista previa de ambas vistas.
+
+## Avance 5: Mejoras en la Interfaz de Usuario y Navegación
+Fecha: [Fecha actual]
+
+Descripción:
+Se han realizado mejoras significativas en la interfaz de usuario de las vistas de creación de reportes y multimedia, unificando el diseño y mejorando la experiencia de usuario. Además, se ha implementado la funcionalidad de navegación con un botón de retroceso.
+
+Características Implementadas:
+1. Unificación de Diseño:
+   - Ambas vistas (reportes y multimedia) ahora comparten el mismo diseño base y estructura
+   - Eliminación del área de arrastre SOLO en la vista de reportes para optimizar el espacio
+   - Mantenimiento del área de arrastre en la vista de multimedia para una mejor experiencia de usuario
+   - Ajuste de alturas y espaciados para mejor visualización
+   - Implementación de scroll vertical cuando el contenido excede el espacio disponible
+
+2. Mejoras en la Interfaz:
+   - Contenedor principal ajustado al 90% de la altura de la ventana
+   - Padding consistente en los formularios
+   - Altura fija para el área de texto del reporte
+   - Input de archivos más compacto y consistente
+   - Mejor distribución de los elementos en la página
+
+3. Funcionalidad de Navegación:
+   - Implementación del botón de retroceso en la esquina superior izquierda
+   - El botón redirige al usuario a la página de inicio (/)
+   - Efectos visuales al pasar el mouse sobre el botón (hover)
+   - Transición suave en los efectos visuales
+
+4. Optimizaciones:
+   - Eliminación de código JavaScript innecesario en la vista de reportes
+   - Mantenimiento de la funcionalidad de arrastrar y soltar en la vista de multimedia
+   - Mejora en la estructura del HTML
+   - Limpieza de clases CSS redundantes
+   - Mejor manejo del espacio en la vista
+
+Instrucciones de Prueba:
+1. Navegación:
+   - Acceder a cualquiera de las vistas de creación (reportes o multimedia)
+   - Hacer clic en el botón de flecha en la esquina superior izquierda
+   - Verificar que se redirija correctamente a la página de inicio
+
+2. Interfaz de Usuario:
+   - Verificar que todas las vistas sean accesibles sin necesidad de scroll
+   - Comprobar que los elementos estén correctamente alineados
+   - Verificar que los inputs y botones mantengan su estilo consistente
+   - Probar la carga de archivos y la vista previa
+
+3. Responsividad:
+   - Probar en diferentes tamaños de pantalla
+   - Verificar que el scroll funcione correctamente
+   - Comprobar que los elementos se ajusten adecuadamente
+
+4. Funcionalidad de Arrastrar y Soltar:
+   - En la vista de multimedia:
+     * Verificar que el área de arrastre esté visible
+     * Probar el arrastrar y soltar archivos
+     * Comprobar los efectos visuales al arrastrar
+   - En la vista de reportes:
+     * Verificar que el área de arrastre no esté presente
+     * Comprobar que la carga de archivos funcione mediante el botón de selección
+
+Casos de Éxito:
+- El botón de retroceso funciona correctamente
+- La interfaz mantiene su diseño consistente
+- Los elementos son accesibles y visibles
+- El scroll funciona cuando es necesario
+- La carga de archivos y vista previa funcionan correctamente
+- El área de arrastre funciona correctamente en la vista de multimedia
+
+Notas Adicionales:
+- La eliminación del área de arrastre en la vista de reportes mejora la usabilidad al optimizar el espacio
+- El mantenimiento del área de arrastre en la vista de multimedia mejora la experiencia de usuario para la carga de archivos
+- El diseño unificado facilita el mantenimiento del código
+- La navegación intuitiva mejora la experiencia del usuario
+
+Próximo Paso:
+- Implementar la funcionalidad de edición y eliminación de archivos en la vista previa
+- Agregar confirmaciones antes de abandonar la página con cambios sin guardar
+- Mejorar el feedback visual durante la carga de archivos 
