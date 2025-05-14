@@ -10,7 +10,6 @@
         <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
     </head>
     <body>
-        @include('layout.header')
         <main>
             @include('layout.sidebar')
             @yield('content')

@@ -1,4 +1,4 @@
-@extends('layout.master')
+@extends('auth.master')
 
 @section('title', 'Iniciar Sesión - SketchReport')
 

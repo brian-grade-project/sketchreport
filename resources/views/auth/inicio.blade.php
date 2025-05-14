@@ -1,3 +1,4 @@
+{{-- TODO: cambiar la ubicacion de este archivo --}}
 @extends('layout.master')
 
 @section('title', 'Inicio')
