@@ -16,7 +16,7 @@ class MultimediaController extends Controller
      */
     public function index()
     {
-        $multimedias = Multimedia::with('media_files')->latest()->paginate(10);
+        $multimedias = Multimedia::latest()->paginate(10);
         return view('multimedia.index', compact('multimedias'));
     }
 

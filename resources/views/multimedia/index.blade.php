@@ -71,54 +71,41 @@
             </tr>
             @foreach($multimedias as $multimedia)
             <tr data-id="{{ $multimedia->id }}" class="hover:bg-zinc-600 transition-colors duration-200">
-                <td class="p-2">{{ $multimedia->title }}</td>
+                <td class="p-2">{{ $multimedia->text }}</td>
                 <td class="p-2">{{ $multimedia->media_date }}</td>
                 <td class="p-2">
-                    @if($multimedia->media_files->count() > 0)
-                        <span class="text-sm">{{ $multimedia->media_files->count() }} archivos</span>
-                    @else
-                        <span class="text-sm">Sin archivos</span>
-                    @endif
+                    <span class="text-sm">{{ ucfirst($multimedia->type) }}</span>
                 </td>
                 <td class="p-2">
                     <!-- Preview Section -->
                     <div class="flex flex-row justify-center gap-1 mb-1">
-                        @foreach($multimedia->media_files->take(2) as $media)
-                            <div class="relative bg-zinc-700 rounded-lg p-1 group">
-                                @if(str_starts_with($media->file_type, 'image/'))
-                                    <img src="{{ asset('storage/' . $media->file_path) }}" 
-                                         alt="Preview" 
-                                         class="w-16 h-16 object-cover rounded-lg"
-                                         onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'w-16 h-16 bg-zinc-600 rounded-lg flex items-center justify-center\'><svg class=\'w-8 h-8 fill-orange-600\' xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\'><path d=\'M19,3H5A2,2,0,0,0,3,5V19a2,2,0,0,0,2,2H19a2,2,0,0,0,2-2V5A2,2,0,0,0,19,3ZM5,19V5H19V19Z\'/></svg></div>'">
-                                @elseif(str_starts_with($media->file_type, 'video/'))
-                                    <div class="w-16 h-16 bg-zinc-600 rounded-lg flex items-center justify-center">
-                                        <svg class="w-8 h-8 fill-orange-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                                            <path d="M12,2A10,10,0,1,0,22,12,10,10,0,0,0,12,2Zm0,18a8,8,0,1,1,8-8A8,8,0,0,1,12,20ZM10,9.5v5a.5.5,0,0,0,.5.5.5.5,0,0,0,.5-.5v-5a.5.5,0,0,0-.5-.5A.5.5,0,0,0,10,9.5Zm4,0v5a.5.5,0,0,0,.5.5.5.5,0,0,0,.5-.5v-5a.5.5,0,0,0-.5-.5A.5.5,0,0,0,14,9.5Z"/>
-                                        </svg>
-                                    </div>
-                                @elseif(str_starts_with($media->file_type, 'audio/'))
-                                    <div class="w-16 h-16 bg-zinc-600 rounded-lg flex items-center justify-center">
-                                        <svg class="w-8 h-8 fill-orange-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                                            <path d="M12,2A10,10,0,1,0,22,12,10,10,0,0,0,12,2Zm0,18a8,8,0,1,1,8-8A8,8,0,0,1,12,20ZM10,9.5v5a.5.5,0,0,0,.5.5.5.5,0,0,0,.5-.5v-5a.5.5,0,0,0-.5-.5A.5.5,0,0,0,10,9.5Zm4,0v5a.5.5,0,0,0,.5.5.5.5,0,0,0,.5-.5v-5a.5.5,0,0,0-.5-.5A.5.5,0,0,0,14,9.5Z"/>
-                                        </svg>
-                                    </div>
-                                @else
-                                    <div class="w-16 h-16 bg-zinc-600 rounded-lg flex items-center justify-center">
-                                        <svg class="w-8 h-8 fill-orange-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                                            <path d="M19,3H5A2,2,0,0,0,3,5V19a2,2,0,0,0,2,2H19a2,2,0,0,0,2-2V5A2,2,0,0,0,19,3ZM5,19V5H19V19Z"/>
-                                            <text x="8" y="18" class="text-xs fill-current">{{ strtoupper(pathinfo($media->file_path, PATHINFO_EXTENSION)) }}</text>
-                                        </svg>
-                                    </div>
-                                @endif
-                            </div>
-                        @endforeach
-                        @if($multimedia->media_files->count() > 2)
-                            <div class="relative bg-zinc-700 rounded-lg p-1">
+                        <div class="relative bg-zinc-700 rounded-lg p-1 group">
+                            @if($multimedia->type === 'image')
+                                <img src="{{ asset('storage/' . $multimedia->path) }}" 
+                                     alt="Preview" 
+                                     class="w-16 h-16 object-cover rounded-lg"
+                                     onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'w-16 h-16 bg-zinc-600 rounded-lg flex items-center justify-center\'><svg class=\'w-8 h-8 fill-orange-600\' xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\'><path d=\'M19,3H5A2,2,0,0,0,3,5V19a2,2,0,0,0,2,2H19a2,2,0,0,0,2-2V5A2,2,0,0,0,19,3ZM5,19V5H19V19Z\'/></svg></div>'">
+                            @elseif($multimedia->type === 'video')
                                 <div class="w-16 h-16 bg-zinc-600 rounded-lg flex items-center justify-center">
-                                    <span class="text-orange-600 text-sm">+{{ $multimedia->media_files->count() - 2 }}</span>
+                                    <svg class="w-8 h-8 fill-orange-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                        <path d="M12,2A10,10,0,1,0,22,12,10,10,0,0,0,12,2Zm0,18a8,8,0,1,1,8-8A8,8,0,0,1,12,20ZM10,9.5v5a.5.5,0,0,0,.5.5.5.5,0,0,0,.5-.5v-5a.5.5,0,0,0-.5-.5A.5.5,0,0,0,10,9.5Zm4,0v5a.5.5,0,0,0,.5.5.5.5,0,0,0,.5-.5v-5a.5.5,0,0,0-.5-.5A.5.5,0,0,0,14,9.5Z"/>
+                                    </svg>
                                 </div>
-                            </div>
-                        @endif
+                            @elseif($multimedia->type === 'audio')
+                                <div class="w-16 h-16 bg-zinc-600 rounded-lg flex items-center justify-center">
+                                    <svg class="w-8 h-8 fill-orange-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                        <path d="M12,2A10,10,0,1,0,22,12,10,10,0,0,0,12,2Zm0,18a8,8,0,1,1,8-8A8,8,0,0,1,12,20ZM10,9.5v5a.5.5,0,0,0,.5.5.5.5,0,0,0,.5-.5v-5a.5.5,0,0,0-.5-.5A.5.5,0,0,0,10,9.5Zm4,0v5a.5.5,0,0,0,.5.5.5.5,0,0,0,.5-.5v-5a.5.5,0,0,0-.5-.5A.5.5,0,0,0,14,9.5Z"/>
+                                    </svg>
+                                </div>
+                            @else
+                                <div class="w-16 h-16 bg-zinc-600 rounded-lg flex items-center justify-center">
+                                    <svg class="w-8 h-8 fill-orange-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                        <path d="M19,3H5A2,2,0,0,0,3,5V19a2,2,0,0,0,2,2H19a2,2,0,0,0,2-2V5A2,2,0,0,0,19,3ZM5,19V5H19V19Z"/>
+                                        <text x="8" y="18" class="text-xs fill-current">{{ strtoupper(pathinfo($multimedia->path, PATHINFO_EXTENSION)) }}</text>
+                                    </svg>
+                                </div>
+                            @endif
+                        </div>
                     </div>
                     <!-- Action Buttons -->
                     <div class="flex justify-center space-x-2">
@@ -184,97 +171,25 @@
             });
         });
 
-        // Función para obtener el tipo predominante de archivos
-        function getPredominantFileType(mediaFiles) {
-            const typeCount = {};
-            mediaFiles.forEach(file => {
-                const type = file.file_type.split('/')[0];
-                typeCount[type] = (typeCount[type] || 0) + 1;
-            });
-            
-            return Object.entries(typeCount)
-                .sort((a, b) => b[1] - a[1])[0][0];
-        }
-
         // Función de filtrado
         function filterTable(type) {
-            const rows = Array.from(document.querySelectorAll('#multimedia-list tr:not(.add-row)'));
-            const tbody = document.getElementById('multimedia-list');
-            const buttons = document.querySelectorAll('.dropdown-content button');
-            
-            // Remover la clase activa de todos los botones
-            buttons.forEach(btn => btn.classList.remove('bg-orange-600', 'text-zinc-800'));
-            
-            // Agregar la clase activa al botón seleccionado
-            const activeButton = document.querySelector(`.dropdown-content button[onclick="filterTable('${type}')"]`);
-            if (activeButton) {
-                activeButton.classList.add('bg-orange-600', 'text-zinc-800');
-            }
-            
-            rows.sort((a, b) => {
-                let aValue, bValue;
-                
-                switch(type) {
-                    case 'name':
-                        aValue = a.children[0].textContent.toLowerCase();
-                        bValue = b.children[0].textContent.toLowerCase();
-                        return aValue.localeCompare(bValue);
-                        
-                    case 'date':
-                        aValue = new Date(a.children[1].textContent);
-                        bValue = new Date(b.children[1].textContent);
-                        return bValue - aValue; // Más reciente primero
-                        
-                    case 'type':
-                        aValue = a.children[2].textContent.toLowerCase();
-                        bValue = b.children[2].textContent.toLowerCase();
-                        return aValue.localeCompare(bValue);
-                        
-                    default:
-                        return 0;
-                }
-            });
-            
-            // Mantener la fila de "agregar" al principio
-            const addRow = document.querySelector('.add-row');
-            tbody.innerHTML = '';
-            if (addRow) tbody.appendChild(addRow);
-            rows.forEach(row => tbody.appendChild(row));
-    }
-
-        function resetTable() {
-            const rows = Array.from(document.querySelectorAll('#multimedia-list tr:not(.add-row)'));
-            const tbody = document.getElementById('multimedia-list');
-            const buttons = document.querySelectorAll('.dropdown-content button');
-            
-            // Remover la clase activa de todos los botones
-            buttons.forEach(btn => btn.classList.remove('bg-orange-600', 'text-zinc-800'));
-            
-            rows.sort((a, b) => {
-                const aId = parseInt(a.dataset.id);
-                const bId = parseInt(b.dataset.id);
-                return aId - bId;
-            });
-            
-            // Mantener la fila de "agregar" al principio
-            const addRow = document.querySelector('.add-row');
-            tbody.innerHTML = '';
-            if (addRow) tbody.appendChild(addRow);
-            rows.forEach(row => tbody.appendChild(row));
-    }
-
-        // Inicializar los tipos predominantes de archivos
-        document.addEventListener('DOMContentLoaded', function() {
             const rows = document.querySelectorAll('#multimedia-list tr:not(.add-row)');
             rows.forEach(row => {
-                const mediaFiles = JSON.parse(row.dataset.mediaFiles || '[]');
-                if (mediaFiles.length > 0) {
-                    row.dataset.predominantType = getPredominantFileType(mediaFiles);
+                const cell = row.querySelector(`td:nth-child(${type === 'name' ? 1 : type === 'date' ? 2 : 3})`);
+                if (cell) {
+                    row.style.display = '';
                 }
             });
-        });
+        }
+
+        // Función para resetear la tabla
+        function resetTable() {
+            const rows = document.querySelectorAll('#multimedia-list tr:not(.add-row)');
+            rows.forEach(row => {
+                row.style.display = '';
+            });
+        }
   </script>
-</div>
 </body>
 </html>
 @endsection
