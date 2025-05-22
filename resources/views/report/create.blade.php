@@ -1,14 +1,13 @@
 @extends('layout.master')
 
-@section('title', 'Crear Reporte')
+@section('title', isset($isReadOnly) ? 'Ver Reporte' : 'Crear Reporte')
 
 @section('content')
-
 <div class="w-[100vw] min-h-[100vh] bg-[url(/img/imglogin.jpg)] bg-no-repeat bg-cover pt-5 pb-10 relative">
     <div class="bg-black/20 backdrop-blur-sm absolute inset-0 w-full h-full"></div>
     <div class="w-[80%] min-h-[90%] bg-zinc-800 m-auto mt-5 mb-10 relative overflow-y-auto rounded-3xl flex">
 
-    <form id="reportForm" class="flex flex-row flex-auto flex-wrap relative float-left lg:w-[62%] md:w-[60%] p-4" action="{{ route('reporte.store') }}" method="POST" enctype="multipart/form-data">
+    <form id="reportForm" class="flex flex-row flex-auto flex-wrap relative float-left lg:w-[62%] md:w-[60%] p-4" action="{{ isset($isReadOnly) ? '#' : route('reporte.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
 
         <div class="absolute left-[2%] top-[2%] w-[15%] h-[10%]">
@@ -19,29 +18,66 @@
 
             <div class="relative ml-16 lg:w-60 md:w-[48%]">
                 <label for="title" class="text-xl text-orange-600 block ml-5 mt-10 pb-1 font-light">Título del reporte</label>
-                <input type="text" class="bg-white rounded-full w-full p-1" name="title" id="title" placeholder="Ingrese título">
+                <input type="text" class="bg-white rounded-full w-full p-1" name="title" id="title" 
+                    value="{{ isset($reporte) ? $reporte->title : '' }}"
+                    {{ isset($isReadOnly) ? 'readonly' : '' }}
+                    placeholder="Ingrese título">
             </div>
         
             <div class="relative ml-14 w-[25%]">
                 <label for="report_date" class="text-xl text-orange-600 block mt-10 ml-4 font-light pb-1">Fecha</label>
-                <input type="date" class="bg-white rounded-full w-full p-1" name="report_date" id="report_date">
+                <input type="date" class="bg-white rounded-full w-full p-1" name="report_date" id="report_date"
+                    value="{{ isset($reporte) ? $reporte->report_date->format('Y-m-d') : '' }}"
+                    {{ isset($isReadOnly) ? 'readonly' : '' }}>
             </div>
 
             <div class="relative float-left mt-8 ml-16 w-[86%]">
                 <label for="content" class="text-xl text-orange-600 block pb-1 font-light">Contenido del reporte</label>
-                <textarea class="bg-white rounded-lg w-full p-4 min-h-[200px] resize-y" name="content" id="content" placeholder="Ingrese el contenido del reporte"></textarea>
+                <textarea class="bg-white rounded-lg w-full p-4 min-h-[200px] resize-y" name="content" id="content" 
+                    {{ isset($isReadOnly) ? 'readonly' : '' }}
+                    placeholder="Ingrese el contenido del reporte">{{ isset($reporte) ? $reporte->text : '' }}</textarea>
             </div>
 
+            @if(!isset($isReadOnly))
             <div class="relative float-left mt-8 ml-16 w-[40%]">
                 <label for="media" class="text-xl text-orange-600 block pb-1 font-light">Archivos multimedia</label>
                 <input type="file" multiple class="resize-none bg-white rounded w-full h-10 rounded-full" name="media[]" id="media" accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt">
             </div>
+            @endif
 
             <!-- Preview Section -->
             <div id="previewSection" class="relative float-left ml-16 w-[86%] mt-8 bg-zinc-800/50 p-4 rounded-lg">
                 <h3 class="text-xl text-orange-600 mb-4 font-light">Vista Previa de Archivos</h3>
                 <div id="previewContainer" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    <!-- Previews will be added here dynamically -->
+                    @if(isset($reporte) && $reporte->media_files)
+                        @foreach($reporte->media_files as $media)
+                            <div class="relative bg-zinc-700 rounded-lg p-2 group">
+                                @if(str_starts_with($media->file_type, 'image/'))
+                                    <img src="{{ asset('storage/' . $media->file_path) }}" 
+                                         alt="Preview" 
+                                         class="w-full aspect-square object-cover rounded-lg">
+                                @elseif(str_starts_with($media->file_type, 'video/'))
+                                    <video src="{{ asset('storage/' . $media->file_path) }}" 
+                                           class="w-full aspect-square object-cover rounded-lg"
+                                           controls></video>
+                                @elseif(str_starts_with($media->file_type, 'audio/'))
+                                    <audio src="{{ asset('storage/' . $media->file_path) }}" 
+                                           class="w-full"
+                                           controls></audio>
+                                @else
+                                    <div class="w-full aspect-square bg-zinc-600 rounded-lg flex items-center justify-center">
+                                        <svg class="w-16 h-16 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                                            <text x="8" y="18" class="text-xs fill-current">{{ strtoupper(pathinfo($media->file_path, PATHINFO_EXTENSION)) }}</text>
+                                        </svg>
+                                    </div>
+                                @endif
+                                <div class="mt-2 text-white text-sm truncate">{{ basename($media->file_path) }}</div>
+                            </div>
+                        @endforeach
+                    @endif
+
+                    @if(!isset($isReadOnly))
                     <!-- Botón de agregar más -->
                     <div class="relative bg-zinc-700 rounded-lg p-2">
                         <button type="button" onclick="document.getElementById('media').click()" 
@@ -52,9 +88,11 @@
                         </button>
                         <div class="mt-2 text-white text-sm text-center">Agregar archivo</div>
                     </div>
+                    @endif
                 </div>
             </div>
 
+            @if(!isset($isReadOnly))
             <div class="relative w-[100%] flex flex-row mt-16 mb-8">
                 <div class="relative block ml-16 lg:w-[25%] md:w-[25%] rounded-full">
                     <button type="submit" class="btn-sm text-center bg-orange-600 w-full rounded-full text-xl font-light h-full hover:bg-orange-700 hover:text-white hover:font-semibold">Guardar</button>
@@ -64,6 +102,7 @@
                     <button type="submit" name="export" value="1" class="btn-sm text-center bg-orange-600 w-full rounded-full text-xl font-light h-full hover:bg-orange-700 hover:text-white hover:font-semibold">Guardar y Exportar</button>
                 </div>
             </div>
+            @endif
     </form>   
 
     <div class="bg-orange-600 w-2/6 flex-grow float-right overflow-clip relative m-0 p-0">
@@ -78,6 +117,7 @@
     </div>
 </div>
 
+@if(!isset($isReadOnly))
 <script>
 // Función para crear vista previa de archivos
 function createPreview(file) {
@@ -210,124 +250,36 @@ function handleFiles(e) {
     const previewSection = document.getElementById('previewSection');
     const previewContainer = document.getElementById('previewContainer');
     
-    console.log('Preview section found:', !!previewSection);
-    console.log('Preview container found:', !!previewContainer);
+    // Remover el botón de agregar si existe
+    const addButton = previewContainer.querySelector('.relative.bg-zinc-700.rounded-lg.p-2');
+    if (addButton) {
+        addButton.remove();
+    }
     
-    // Asegurarse de que la sección de vista previa sea visible
-    previewSection.classList.remove('hidden');
-    
-    files.forEach((file, index) => {
-        console.log(`Processing file ${index + 1}:`, file.name, 'Type:', file.type);
+    files.forEach(file => {
         const preview = createPreview(file);
         if (preview) {
             previewContainer.appendChild(preview);
-            console.log(`Preview added for file ${index + 1}`);
-        } else {
-            console.log(`Failed to create preview for file ${index + 1}`);
         }
     });
+    
+    // Agregar el botón de agregar al final
+    const addButtonDiv = document.createElement('div');
+    addButtonDiv.className = 'relative bg-zinc-700 rounded-lg p-2';
+    addButtonDiv.innerHTML = `
+        <button type="button" onclick="document.getElementById('media').click()" 
+                class="w-full aspect-square bg-zinc-600 rounded-lg flex items-center justify-center hover:bg-zinc-500 transition-colors duration-200 group">
+            <div class="w-12 h-12 border-4 border-orange-600 rounded-full flex items-center justify-center group-hover:border-orange-500">
+                <svg class="w-8 h-8 fill-orange-600 group-hover:fill-orange-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g id="plus"><path d="M12.75,11.25V5a.75.75,0,0,0-1.5,0v6.25H5a.75.75,0,0,0,0,1.5h6.25V19a.76.76,0,0,0,.75.75.75.75,0,0,0,.75-.75V12.75H19a.75.75,0,0,0,.75-.75.76.76,0,0,0-.75-.75Z"/></g></svg>
+            </div>
+        </button>
+        <div class="mt-2 text-white text-sm text-center">Agregar archivo</div>
+    `;
+    previewContainer.appendChild(addButtonDiv);
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM Content Loaded');
-    const fileInput = document.getElementById('media');
-    const form = document.getElementById('reportForm');
-
-    console.log('File input found:', !!fileInput);
-    console.log('Form found:', !!form);
-
-    // Actualizar el event listener para el input de archivos
-    fileInput.addEventListener('change', function(e) {
-        console.log('File input change event triggered');
-        console.log('Number of files selected:', e.target.files.length);
-        if (e.target.files.length > 0) {
-            handleFiles(e);
-        }
-    });
-
-    const fileList = document.getElementById('fileList');
-    const maxFileSize = 10 * 1024 * 1024; // 10MB en bytes
-
-    fileInput.addEventListener('change', function() {
-        fileList.innerHTML = '';
-        let totalSize = 0;
-        
-        for (let i = 0; i < this.files.length; i++) {
-            const file = this.files[i];
-            totalSize += file.size;
-            
-            if (file.size > maxFileSize) {
-                alert(`El archivo ${file.name} excede el tamaño máximo permitido de 10MB`);
-                this.value = '';
-                fileList.innerHTML = '';
-                return;
-            }
-            
-            const li = document.createElement('li');
-            li.className = 'text-white flex items-center space-x-2';
-            li.innerHTML = `
-                <span>${file.name}</span>
-                <span class="text-gray-400">(${(file.size / 1024 / 1024).toFixed(2)} MB)</span>
-            `;
-            fileList.appendChild(li);
-        }
-        
-        if (totalSize > maxFileSize * 5) { // Máximo 50MB en total
-            alert('El tamaño total de los archivos no puede exceder 50MB');
-            this.value = '';
-            fileList.innerHTML = '';
-        }
-    });
-
-    form.addEventListener('submit', async function(e) {
-        e.preventDefault();
-        
-        const formData = new FormData(form);
-        let totalSize = 0;
-        
-        if (fileInput.files.length > 0) {
-            formData.delete('media[]');
-            for (let i = 0; i < fileInput.files.length; i++) {
-                const file = fileInput.files[i];
-                totalSize += file.size;
-                
-                if (file.size > maxFileSize) {
-                    alert(`El archivo ${file.name} excede el tamaño máximo permitido de 10MB`);
-                    return;
-                }
-                
-                formData.append('media[]', file);
-            }
-            
-            if (totalSize > maxFileSize * 5) {
-                alert('El tamaño total de los archivos no puede exceder 50MB');
-                return;
-            }
-        }
-        
-        try {
-            const response = await fetch(form.action, {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'Accept': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            });
-            
-            const result = await response.json();
-            
-            if (result.success) {
-                window.location.href = result.redirect || '{{ route("reporte.index") }}';
-            } else {
-                alert('Error: ' + result.message);
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            alert('Error al guardar el reporte. Por favor, intente nuevamente.');
-        }
-    });
-});
+// Agregar el event listener para el input de archivos
+document.getElementById('media').addEventListener('change', handleFiles);
 </script>
-
-@endsection
+@endif
+@endsection 

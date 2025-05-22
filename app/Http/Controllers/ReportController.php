@@ -19,9 +19,36 @@ class ReportController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Request $request)
     {
-        //
+        \Log::info('Método create llamado', ['request' => $request->all()]);
+        
+        if ($request->has('view')) {
+            try {
+                \Log::info('Intentando cargar reporte para ver', ['id' => $request->view]);
+                $reporte = Report::with('media_files')->findOrFail($request->view);
+                
+                \Log::info('Reporte encontrado', [
+                    'id' => $reporte->id,
+                    'title' => $reporte->title,
+                    'text' => $reporte->text,
+                    'report_date' => $reporte->report_date,
+                    'media_files_count' => $reporte->media_files->count()
+                ]);
+
+                $isReadOnly = true;
+                return view('report.create', [
+                    'reporte' => $reporte,
+                    'isReadOnly' => true
+                ]);
+            } catch (\Exception $e) {
+                \Log::error('Error al cargar el reporte: ' . $e->getMessage());
+                return redirect()->route('reporte.index')
+                    ->with('error', 'Error al cargar el reporte: ' . $e->getMessage());
+            }
+        }
+        
+        \Log::info('Creando nuevo reporte');
         return view('report.create');
     }
 
@@ -38,7 +65,7 @@ class ReportController extends Controller
                 'media.*' => 'nullable|file|max:10240' // 10MB máximo por archivo
             ]);
 
-        $report = new Report();
+            $report = new Report();
             $report->title = $request->title;
             $report->text = $request->content;
             $report->report_date = $request->report_date;
@@ -87,7 +114,34 @@ class ReportController extends Controller
      */
     public function show(Report $report)
     {
-        //
+        \Log::info('Método show llamado', ['report_id' => $report->id]);
+        
+        try {
+            // Cargar el reporte con sus archivos multimedia
+            $reporte = Report::with('media_files')->findOrFail($report->id);
+            \Log::info('Reporte encontrado', ['reporte_id' => $reporte->id]);
+            
+            // Depurar los datos
+            \Log::info('Datos del reporte:', [
+                'id' => $reporte->id,
+                'title' => $reporte->title,
+                'text' => $reporte->text,
+                'report_date' => $reporte->report_date,
+                'media_files' => $reporte->media_files->toArray(),
+                'raw_data' => $reporte->toArray(),
+                'attributes' => $reporte->getAttributes()
+            ]);
+            
+            // Pasar el reporte a la vista create en modo lectura
+            return view('report.create', [
+                'reporte' => $reporte,
+                'isReadOnly' => true
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Error en show method: ' . $e->getMessage());
+            return redirect()->route('reporte.index')
+                ->with('error', 'Error al mostrar el reporte: ' . $e->getMessage());
+        }
     }
 
     /**

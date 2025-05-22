@@ -1,14 +1,8 @@
 @extends('layout.master')
 
+@section('title', 'Reportes')
+
 @section('content')
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lista de Reportes</title>
-</head>
-<body>
 <div class="w-[100vw] h-[100vh] bg-[url(/img/imglogin.jpg)] bg-no-repeat bg-cover bg-fixed pt-5 relative">
     <div class="bg-black/20 backdrop-blur-sm w-[100vw] absolute inset-0 z-0"></div>
 
@@ -44,7 +38,7 @@
           </div>
         </div>
       </div>
-        
+
       <div class="overflow-y-auto flex-1 pr-2">
         <table class="w-full border-separate bg-zinc-800 mb-5 rounded-md p-5">
             <thead class="sticky top-0 bg-zinc-800 z-10">
@@ -122,7 +116,8 @@
                     </div>
                     <!-- Action Buttons -->
                     <div class="flex justify-center space-x-2">
-                        <a href="{{ route('reporte.show', $reporte) }}" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-full text-sm">
+                        <a href="{{ route('reporte.create', ['view' => $reporte->id]) }}" 
+                           class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-full text-sm">
                             Ver
                         </a>
                         <a href="{{ route('reporte.edit', $reporte) }}" class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded-full text-sm">
@@ -140,141 +135,164 @@
                 </td>
             </tr>
             @endforeach
-         </tbody>
-         </table>
-    </div>
- 
-      <div class="mt-4">
-         {{ $reportes->links() }}
-      </div>
+        </tbody>
+        </table>
     </div>
 
-    @if(session('success'))
-    <div class="fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg">
-        {{ session('success') }}
+    <div class="mt-4">
+       {{ $reportes->links() }}
     </div>
-    @endif
+</div>
 
-  <script>
-        // Función para mostrar/ocultar el dropdown
-        document.querySelector('button').addEventListener('click', function(e) {
-            e.stopPropagation();
-            const dropdownContent = document.getElementById('dropdown-content');
-            dropdownContent.classList.toggle('opacity-0');
-            dropdownContent.classList.toggle('invisible');
-            dropdownContent.classList.toggle('scale-x-0');
-        });
+<script>
+    // Función para mostrar/ocultar el dropdown
+    const filterButton = document.querySelector('.relative button');
+    const dropdownContent = document.getElementById('dropdown-content');
 
-        // Cerrar el dropdown al hacer clic fuera
-        document.addEventListener('click', function(e) {
-            if (!e.target.closest('.relative')) {
-                const dropdownContent = document.getElementById('dropdown-content');
-                dropdownContent.classList.add('opacity-0', 'invisible', 'scale-x-0');
-            }
-        });
+    filterButton.addEventListener('click', function(e) {
+        e.stopPropagation();
+        dropdownContent.classList.toggle('opacity-0');
+        dropdownContent.classList.toggle('invisible');
+        dropdownContent.classList.toggle('scale-x-0');
+    });
 
-        // Función de búsqueda
-        document.getElementById('search').addEventListener('keyup', function() {
-            const searchText = this.value.toLowerCase();
-            const rows = document.querySelectorAll('#report-list tr:not(.add-row)');
-            
-            rows.forEach(row => {
-                const text = row.textContent.toLowerCase();
-                row.style.display = text.includes(searchText) ? '' : 'none';
-            });
-        });
-
-        // Función para obtener el tipo predominante de archivos
-        function getPredominantFileType(mediaFiles) {
-            const typeCount = {};
-            mediaFiles.forEach(file => {
-                const type = file.file_type.split('/')[0];
-                typeCount[type] = (typeCount[type] || 0) + 1;
-            });
-            
-            return Object.entries(typeCount)
-                .sort((a, b) => b[1] - a[1])[0][0];
+    // Cerrar el dropdown al hacer clic fuera
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.relative')) {
+            dropdownContent.classList.add('opacity-0', 'invisible', 'scale-x-0');
         }
+    });
 
-        // Función de filtrado
-        function filterTable(type) {
-            const rows = Array.from(document.querySelectorAll('#report-list tr:not(.add-row)'));
-            const tbody = document.getElementById('report-list');
-            const buttons = document.querySelectorAll('.dropdown-content button');
+    // Función de búsqueda
+    document.getElementById('search').addEventListener('keyup', function() {
+        const searchText = this.value.toLowerCase();
+        const rows = document.querySelectorAll('#report-list tr:not(.add-row)');
+        
+        rows.forEach(row => {
+            const text = row.textContent.toLowerCase();
+            row.style.display = text.includes(searchText) ? '' : 'none';
+        });
+    });
+
+    // Función para obtener el tipo predominante de archivos
+    function getPredominantFileType(mediaFiles) {
+        if (!mediaFiles || mediaFiles.length === 0) return 'none';
+        
+        const typeCount = {};
+        mediaFiles.forEach(file => {
+            const type = file.file_type.split('/')[0];
+            typeCount[type] = (typeCount[type] || 0) + 1;
+        });
+        
+        const sortedTypes = Object.entries(typeCount)
+            .sort((a, b) => b[1] - a[1]);
             
-            // Remover la clase activa de todos los botones
-            buttons.forEach(btn => btn.classList.remove('bg-orange-600', 'text-zinc-800'));
-            
-            // Agregar la clase activa al botón seleccionado
-            const activeButton = document.querySelector(`.dropdown-content button[onclick="filterTable('${type}')"]`);
-            if (activeButton) {
-                activeButton.classList.add('bg-orange-600', 'text-zinc-800');
-            }
-            
-            rows.sort((a, b) => {
-                let aValue, bValue;
-                
-                switch(type) {
-                    case 'name':
-                        aValue = a.children[0].textContent.toLowerCase();
-                        bValue = b.children[0].textContent.toLowerCase();
-                        return aValue.localeCompare(bValue);
-                        
-                    case 'date':
-                        aValue = new Date(a.children[1].textContent);
-                        bValue = new Date(b.children[1].textContent);
-                        return bValue - aValue; // Más reciente primero
-                        
-                    case 'type':
-                        aValue = a.children[2].textContent.toLowerCase();
-                        bValue = b.children[2].textContent.toLowerCase();
-                        return aValue.localeCompare(bValue);
-                        
-                    default:
-                        return 0;
-                }
-            });
-            
-            // Mantener la fila de "agregar" al principio
-            const addRow = document.querySelector('.add-row');
-            tbody.innerHTML = '';
-            if (addRow) tbody.appendChild(addRow);
-            rows.forEach(row => tbody.appendChild(row));
+        return sortedTypes.length > 0 ? sortedTypes[0][0] : 'none';
     }
 
-        function resetTable() {
-            const rows = Array.from(document.querySelectorAll('#report-list tr:not(.add-row)'));
-            const tbody = document.getElementById('report-list');
-            const buttons = document.querySelectorAll('.dropdown-content button');
-            
-            // Remover la clase activa de todos los botones
-            buttons.forEach(btn => btn.classList.remove('bg-orange-600', 'text-zinc-800'));
-            
-            rows.sort((a, b) => {
-                const aId = parseInt(a.dataset.id);
-                const bId = parseInt(b.dataset.id);
-                return aId - bId;
-            });
-            
-            // Mantener la fila de "agregar" al principio
-            const addRow = document.querySelector('.add-row');
-            tbody.innerHTML = '';
-            if (addRow) tbody.appendChild(addRow);
-            rows.forEach(row => tbody.appendChild(row));
+    // Función de filtrado
+    function filterTable(type) {
+        console.log('Filtrando por:', type); // Debug log
+        
+        const rows = Array.from(document.querySelectorAll('#report-list tr:not(.add-row)'));
+        const tbody = document.getElementById('report-list');
+        const buttons = document.querySelectorAll('.dropdown-content button');
+        
+        // Remover la clase activa de todos los botones
+        buttons.forEach(btn => {
+            btn.classList.remove('bg-orange-600', 'text-zinc-800');
+            btn.classList.add('bg-zinc-800', 'text-orange-600');
+        });
+        
+        // Agregar la clase activa al botón seleccionado
+        const activeButton = document.querySelector(`.dropdown-content button[onclick="filterTable('${type}')"]`);
+        if (activeButton) {
+            activeButton.classList.remove('bg-zinc-800', 'text-orange-600');
+            activeButton.classList.add('bg-orange-600', 'text-zinc-800');
         }
 
-        // Inicializar los tipos predominantes de archivos
-        document.addEventListener('DOMContentLoaded', function() {
-            const rows = document.querySelectorAll('#report-list tr:not(.add-row)');
-            rows.forEach(row => {
-                const mediaFiles = JSON.parse(row.dataset.mediaFiles || '[]');
-                if (mediaFiles.length > 0) {
-                    row.dataset.predominantType = getPredominantFileType(mediaFiles);
-                }
-            });
+        // Cerrar el dropdown después de seleccionar
+        dropdownContent.classList.add('opacity-0', 'invisible', 'scale-x-0');
+        
+        // Ordenar las filas
+        const sortedRows = rows.sort((a, b) => {
+            let aValue, bValue;
+            
+            switch(type) {
+                case 'name':
+                    aValue = a.querySelector('td:first-child').textContent.trim().toLowerCase();
+                    bValue = b.querySelector('td:first-child').textContent.trim().toLowerCase();
+                    console.log('Comparando nombres:', aValue, bValue);
+                    return aValue.localeCompare(bValue);
+                    
+                case 'date':
+                    aValue = new Date(a.querySelector('td:nth-child(2)').textContent.trim());
+                    bValue = new Date(b.querySelector('td:nth-child(2)').textContent.trim());
+                    console.log('Comparando fechas:', aValue, bValue);
+                    return bValue - aValue; // Más reciente primero
+                    
+                case 'type':
+                    const aMediaFiles = JSON.parse(a.dataset.mediaFiles || '[]');
+                    const bMediaFiles = JSON.parse(b.dataset.mediaFiles || '[]');
+                    aValue = getPredominantFileType(aMediaFiles);
+                    bValue = getPredominantFileType(bMediaFiles);
+                    console.log('Comparando tipos:', aValue, bValue);
+                    return aValue.localeCompare(bValue);
+                    
+                default:
+                    return 0;
+            }
         });
-  </script>
-</div>
-</body>
-</html>
+        
+        // Limpiar y reconstruir la tabla
+        const addRow = document.querySelector('.add-row');
+        tbody.innerHTML = '';
+        if (addRow) tbody.appendChild(addRow);
+        sortedRows.forEach(row => tbody.appendChild(row));
+    }
+
+    function resetTable() {
+        console.log('Reseteando tabla'); // Debug log
+        
+        const rows = Array.from(document.querySelectorAll('#report-list tr:not(.add-row)'));
+        const tbody = document.getElementById('report-list');
+        const buttons = document.querySelectorAll('.dropdown-content button');
+        
+        // Remover la clase activa de todos los botones
+        buttons.forEach(btn => {
+            btn.classList.remove('bg-orange-600', 'text-zinc-800');
+            btn.classList.add('bg-zinc-800', 'text-orange-600');
+        });
+
+        // Cerrar el dropdown
+        dropdownContent.classList.add('opacity-0', 'invisible', 'scale-x-0');
+        
+        // Ordenar por ID
+        const sortedRows = rows.sort((a, b) => {
+            const aId = parseInt(a.dataset.id);
+            const bId = parseInt(b.dataset.id);
+            console.log('Comparando IDs:', aId, bId);
+            return aId - bId;
+        });
+        
+        // Limpiar y reconstruir la tabla
+        const addRow = document.querySelector('.add-row');
+        tbody.innerHTML = '';
+        if (addRow) tbody.appendChild(addRow);
+        sortedRows.forEach(row => tbody.appendChild(row));
+    }
+
+    // Inicializar los tipos predominantes de archivos
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('DOM cargado'); // Debug log
+        
+        const rows = document.querySelectorAll('#report-list tr:not(.add-row)');
+        rows.forEach(row => {
+            const mediaFiles = JSON.parse(row.dataset.mediaFiles || '[]');
+            if (mediaFiles.length > 0) {
+                row.dataset.predominantType = getPredominantFileType(mediaFiles);
+            }
+        });
+    });
+</script>
 @endsection

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Carbon\Carbon;
 
 class Report extends Model
 {
@@ -16,6 +17,15 @@ class Report extends Model
         'report_date',
         'user_id'
     ];
+
+    protected $casts = [
+        'report_date' => 'date'
+    ];
+
+    public function getReportDateAttribute($value)
+    {
+        return $value ? Carbon::parse($value) : null;
+    }
 
     public function multimedias(): HasMany
     {
