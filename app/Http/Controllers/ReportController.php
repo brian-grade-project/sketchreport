@@ -278,8 +278,39 @@ class ReportController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Report $report)
+    public function destroy($id)
     {
-        //
+        try {
+            \Log::info('Método destroy llamado', ['id' => $id]);
+            
+            $report = Report::findOrFail($id);
+            
+            // Eliminar archivos multimedia asociados
+            foreach ($report->media_files as $media) {
+                // Eliminar archivo físico
+                $filePath = storage_path('app/public/' . $media->file_path);
+                if (file_exists($filePath)) {
+                    unlink($filePath);
+                }
+                // Eliminar registro de la base de datos
+                $media->delete();
+            }
+            
+            // Eliminar el reporte
+            $report->delete();
+            
+            \Log::info('Reporte eliminado exitosamente', ['id' => $id]);
+            
+            return redirect()->route('reporte.index')
+                ->with('success', 'Reporte eliminado exitosamente');
+        } catch (\Exception $e) {
+            \Log::error('Error al eliminar el reporte: ' . $e->getMessage(), [
+                'id' => $id,
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return redirect()->route('reporte.index')
+                ->with('error', 'Error al eliminar el reporte: ' . $e->getMessage());
+        }
     }
 }

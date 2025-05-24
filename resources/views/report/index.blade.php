@@ -9,8 +9,8 @@
     <div class="w-[80%] md:w-[90%] h-[80vh] bg-orange-600 m-auto mt-5 p-8 pt-3 rounded-xl relative shadow-xl overflow-hidden flex flex-col">
 
       <div class="w-[15%] h-[10%] md:h-[5%] mb-5 md:mb-5 lg:mb-7 lg:mt-1 xl:mb-10 xl:w-[14%] 2xl:mb-12">
-          <a href="{{ url()->previous() }}">
-          <svg class="w-[30%] fill-zinc-800 hover:bg-zinc-800 hover:fill-orange-600 transition-all duration-500 ease-in-out rounded-full" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g id="arrow-left"><path d="M11,18.75a.74.74,0,0,1-.53-.22l-6-6a.75.75,0,0,1,0-1.06l6-6a.75.75,0,0,1,1.06,1.06L6.06,12l5.47,5.47a.75.75,0,0,1,0,1.06A.74.74,0,0,1,11,18.75Z"/><path d="M19,12.75H5a.75.75,0,0,1,0-1.5H19a.75.75,0,0,1,0,1.5Z"/></g></svg>
+          <a href="{{ route('home') }}" class="block">
+              <svg class="w-[30%] fill-zinc-800 hover:bg-zinc-800 hover:fill-orange-600 transition-all duration-500 ease-in-out rounded-full cursor-pointer" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g id="arrow-left"><path d="M11,18.75a.74.74,0,0,1-.53-.22l-6-6a.75.75,0,0,1,0-1.06l6-6a.75.75,0,0,1,1.06,1.06L6.06,12l5.47,5.47a.75.75,0,0,1,0,1.06A.74.74,0,0,1,11,18.75Z"/><path d="M19,12.75H5a.75.75,0,0,1,0-1.5H19a.75.75,0,0,1,0,1.5Z"/></g></svg>
           </a>
       </div>
 
@@ -127,8 +127,9 @@
                         <form action="{{ route('reporte.destroy', $reporte) }}" method="POST" class="inline">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-full text-sm" 
-                                    onclick="return confirm('¿Estás seguro de eliminar este reporte?')">
+                            <button type="button" 
+                                    onclick="confirmDelete({{ $reporte->id }}, '{{ $reporte->title }}')" 
+                                    class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-full text-sm">
                                 Eliminar
                             </button>
                         </form>
@@ -145,155 +146,211 @@
     </div>
 </div>
 
-  <script>
-    // Función para mostrar/ocultar el dropdown
-    const filterButton = document.querySelector('.relative button');
-    const dropdownContent = document.getElementById('dropdown-content');
+<!-- Diálogo de confirmación -->
+<div id="deleteConfirmDialog" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+    <div class="bg-zinc-800 p-6 rounded-lg shadow-xl max-w-md w-full mx-4">
+        <h3 class="text-xl font-semibold text-orange-600 mb-4">Confirmar Eliminación</h3>
+        <p class="text-orange-600 mb-6">¿Estás seguro de que deseas eliminar el reporte "<span id="reportTitle" class="font-semibold"></span>"? Esta acción no se puede deshacer.</p>
+        <div class="flex justify-end space-x-4">
+            <button onclick="closeDeleteDialog()" 
+                    class="bg-zinc-700 hover:bg-zinc-600 text-orange-600 px-4 py-2 rounded-lg transition-colors duration-200">
+                Cancelar
+            </button>
+            <button onclick="deleteReport()" 
+                    class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors duration-200">
+                Eliminar
+            </button>
+        </div>
+    </div>
+</div>
 
-    filterButton.addEventListener('click', function(e) {
-        e.stopPropagation();
-        dropdownContent.classList.toggle('opacity-0');
-        dropdownContent.classList.toggle('invisible');
-        dropdownContent.classList.toggle('scale-x-0');
+<script>
+let reportToDelete = null;
+
+function confirmDelete(id, title) {
+    reportToDelete = id;
+    document.getElementById('reportTitle').textContent = title;
+    document.getElementById('deleteConfirmDialog').classList.remove('hidden');
+    document.getElementById('deleteConfirmDialog').classList.add('flex');
+}
+
+function closeDeleteDialog() {
+    document.getElementById('deleteConfirmDialog').classList.add('hidden');
+    document.getElementById('deleteConfirmDialog').classList.remove('flex');
+    reportToDelete = null;
+}
+
+function deleteReport() {
+    if (reportToDelete) {
+        const form = document.querySelector(`form[action*="/${reportToDelete}"]`);
+        if (form) {
+            form.submit();
+        }
+    }
+    closeDeleteDialog();
+}
+
+// Cerrar el diálogo si se hace clic fuera de él
+document.getElementById('deleteConfirmDialog').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeDeleteDialog();
+    }
+});
+
+// Función para mostrar/ocultar el dropdown
+const filterButton = document.querySelector('.relative button');
+const dropdownContent = document.getElementById('dropdown-content');
+
+filterButton.addEventListener('click', function(e) {
+    e.stopPropagation();
+    dropdownContent.classList.toggle('opacity-0');
+    dropdownContent.classList.toggle('invisible');
+    dropdownContent.classList.toggle('scale-x-0');
+});
+
+// Cerrar el dropdown al hacer clic fuera
+document.addEventListener('click', function(e) {
+    if (!e.target.closest('.relative')) {
+        dropdownContent.classList.add('opacity-0');
+        dropdownContent.classList.add('invisible');
+        dropdownContent.classList.add('scale-x-0');
+    }
+});
+
+// Función de búsqueda
+document.getElementById('search').addEventListener('keyup', function() {
+    const searchText = this.value.toLowerCase();
+    const rows = document.querySelectorAll('#report-list tr:not(.add-row)');
+    
+    rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(searchText) ? '' : 'none';
     });
+});
 
-    // Cerrar el dropdown al hacer clic fuera
-    document.addEventListener('click', function(e) {
-        if (!e.target.closest('.relative')) {
-            dropdownContent.classList.add('opacity-0', 'invisible', 'scale-x-0');
+// Función para obtener el tipo predominante de archivos
+function getPredominantFileType(mediaFiles) {
+    if (!mediaFiles || mediaFiles.length === 0) return 'none';
+    
+    const typeCount = {};
+    mediaFiles.forEach(file => {
+        const type = file.file_type.split('/')[0];
+        typeCount[type] = (typeCount[type] || 0) + 1;
+    });
+    
+    const sortedTypes = Object.entries(typeCount)
+        .sort((a, b) => b[1] - a[1]);
+        
+    return sortedTypes.length > 0 ? sortedTypes[0][0] : 'none';
+}
+
+// Función de filtrado
+function filterTable(type) {
+    console.log('Filtrando por:', type); // Debug log
+    
+    const rows = Array.from(document.querySelectorAll('#report-list tr:not(.add-row)'));
+    const tbody = document.getElementById('report-list');
+    const buttons = document.querySelectorAll('.dropdown-content button');
+    
+    // Remover la clase activa de todos los botones
+    buttons.forEach(btn => {
+        btn.classList.remove('bg-orange-600', 'text-zinc-800');
+        btn.classList.add('bg-zinc-800', 'text-orange-600');
+    });
+    
+    // Agregar la clase activa al botón seleccionado
+    const activeButton = document.querySelector(`.dropdown-content button[onclick="filterTable('${type}')"]`);
+    if (activeButton) {
+        activeButton.classList.remove('bg-zinc-800', 'text-orange-600');
+        activeButton.classList.add('bg-orange-600', 'text-zinc-800');
+    }
+
+    // Cerrar el dropdown después de seleccionar
+    dropdownContent.classList.add('opacity-0');
+    dropdownContent.classList.add('invisible');
+    dropdownContent.classList.add('scale-x-0');
+    
+    // Ordenar las filas
+    const sortedRows = rows.sort((a, b) => {
+        let aValue, bValue;
+        
+        switch(type) {
+            case 'name':
+                aValue = a.querySelector('td:first-child').textContent.trim().toLowerCase();
+                bValue = b.querySelector('td:first-child').textContent.trim().toLowerCase();
+                console.log('Comparando nombres:', aValue, bValue);
+                return aValue.localeCompare(bValue);
+                
+            case 'date':
+                aValue = new Date(a.querySelector('td:nth-child(2)').textContent.trim());
+                bValue = new Date(b.querySelector('td:nth-child(2)').textContent.trim());
+                console.log('Comparando fechas:', aValue, bValue);
+                return bValue - aValue; // Más reciente primero
+                
+            case 'type':
+                const aMediaFiles = JSON.parse(a.dataset.mediaFiles || '[]');
+                const bMediaFiles = JSON.parse(b.dataset.mediaFiles || '[]');
+                aValue = getPredominantFileType(aMediaFiles);
+                bValue = getPredominantFileType(bMediaFiles);
+                console.log('Comparando tipos:', aValue, bValue);
+                return aValue.localeCompare(bValue);
+                
+            default:
+                return 0;
         }
     });
+    
+    // Limpiar y reconstruir la tabla
+    const addRow = document.querySelector('.add-row');
+    tbody.innerHTML = '';
+    if (addRow) tbody.appendChild(addRow);
+    sortedRows.forEach(row => tbody.appendChild(row));
+}
 
-    // Función de búsqueda
-    document.getElementById('search').addEventListener('keyup', function() {
-        const searchText = this.value.toLowerCase();
-        const rows = document.querySelectorAll('#report-list tr:not(.add-row)');
-        
-        rows.forEach(row => {
-            const text = row.textContent.toLowerCase();
-            row.style.display = text.includes(searchText) ? '' : 'none';
-        });
+function resetTable() {
+    console.log('Reseteando tabla'); // Debug log
+    
+    const rows = Array.from(document.querySelectorAll('#report-list tr:not(.add-row)'));
+    const tbody = document.getElementById('report-list');
+    const buttons = document.querySelectorAll('.dropdown-content button');
+    
+    // Remover la clase activa de todos los botones
+    buttons.forEach(btn => {
+        btn.classList.remove('bg-orange-600', 'text-zinc-800');
+        btn.classList.add('bg-zinc-800', 'text-orange-600');
     });
 
-    // Función para obtener el tipo predominante de archivos
-    function getPredominantFileType(mediaFiles) {
-        if (!mediaFiles || mediaFiles.length === 0) return 'none';
-        
-        const typeCount = {};
-        mediaFiles.forEach(file => {
-            const type = file.file_type.split('/')[0];
-            typeCount[type] = (typeCount[type] || 0) + 1;
-        });
-        
-        const sortedTypes = Object.entries(typeCount)
-            .sort((a, b) => b[1] - a[1]);
-            
-        return sortedTypes.length > 0 ? sortedTypes[0][0] : 'none';
-    }
+    // Cerrar el dropdown
+    dropdownContent.classList.add('opacity-0');
+    dropdownContent.classList.add('invisible');
+    dropdownContent.classList.add('scale-x-0');
+    
+    // Ordenar por ID
+    const sortedRows = rows.sort((a, b) => {
+        const aId = parseInt(a.dataset.id);
+        const bId = parseInt(b.dataset.id);
+        console.log('Comparando IDs:', aId, bId);
+        return aId - bId;
+    });
+    
+    // Limpiar y reconstruir la tabla
+    const addRow = document.querySelector('.add-row');
+    tbody.innerHTML = '';
+    if (addRow) tbody.appendChild(addRow);
+    sortedRows.forEach(row => tbody.appendChild(row));
+}
 
-    // Función de filtrado
-    function filterTable(type) {
-        console.log('Filtrando por:', type); // Debug log
-        
-        const rows = Array.from(document.querySelectorAll('#report-list tr:not(.add-row)'));
-        const tbody = document.getElementById('report-list');
-        const buttons = document.querySelectorAll('.dropdown-content button');
-        
-        // Remover la clase activa de todos los botones
-        buttons.forEach(btn => {
-            btn.classList.remove('bg-orange-600', 'text-zinc-800');
-            btn.classList.add('bg-zinc-800', 'text-orange-600');
-        });
-        
-        // Agregar la clase activa al botón seleccionado
-        const activeButton = document.querySelector(`.dropdown-content button[onclick="filterTable('${type}')"]`);
-        if (activeButton) {
-            activeButton.classList.remove('bg-zinc-800', 'text-orange-600');
-            activeButton.classList.add('bg-orange-600', 'text-zinc-800');
+// Inicializar los tipos predominantes de archivos
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM cargado'); // Debug log
+    
+    const rows = document.querySelectorAll('#report-list tr:not(.add-row)');
+    rows.forEach(row => {
+        const mediaFiles = JSON.parse(row.dataset.mediaFiles || '[]');
+        if (mediaFiles.length > 0) {
+            row.dataset.predominantType = getPredominantFileType(mediaFiles);
         }
-
-        // Cerrar el dropdown después de seleccionar
-        dropdownContent.classList.add('opacity-0', 'invisible', 'scale-x-0');
-        
-        // Ordenar las filas
-        const sortedRows = rows.sort((a, b) => {
-            let aValue, bValue;
-            
-            switch(type) {
-                case 'name':
-                    aValue = a.querySelector('td:first-child').textContent.trim().toLowerCase();
-                    bValue = b.querySelector('td:first-child').textContent.trim().toLowerCase();
-                    console.log('Comparando nombres:', aValue, bValue);
-                    return aValue.localeCompare(bValue);
-                    
-                case 'date':
-                    aValue = new Date(a.querySelector('td:nth-child(2)').textContent.trim());
-                    bValue = new Date(b.querySelector('td:nth-child(2)').textContent.trim());
-                    console.log('Comparando fechas:', aValue, bValue);
-                    return bValue - aValue; // Más reciente primero
-                    
-                case 'type':
-                    const aMediaFiles = JSON.parse(a.dataset.mediaFiles || '[]');
-                    const bMediaFiles = JSON.parse(b.dataset.mediaFiles || '[]');
-                    aValue = getPredominantFileType(aMediaFiles);
-                    bValue = getPredominantFileType(bMediaFiles);
-                    console.log('Comparando tipos:', aValue, bValue);
-                    return aValue.localeCompare(bValue);
-                    
-                default:
-                    return 0;
-            }
-        });
-        
-        // Limpiar y reconstruir la tabla
-        const addRow = document.querySelector('.add-row');
-        tbody.innerHTML = '';
-        if (addRow) tbody.appendChild(addRow);
-        sortedRows.forEach(row => tbody.appendChild(row));
-    }
-
-    function resetTable() {
-        console.log('Reseteando tabla'); // Debug log
-        
-        const rows = Array.from(document.querySelectorAll('#report-list tr:not(.add-row)'));
-        const tbody = document.getElementById('report-list');
-        const buttons = document.querySelectorAll('.dropdown-content button');
-        
-        // Remover la clase activa de todos los botones
-        buttons.forEach(btn => {
-            btn.classList.remove('bg-orange-600', 'text-zinc-800');
-            btn.classList.add('bg-zinc-800', 'text-orange-600');
-        });
-
-        // Cerrar el dropdown
-        dropdownContent.classList.add('opacity-0', 'invisible', 'scale-x-0');
-        
-        // Ordenar por ID
-        const sortedRows = rows.sort((a, b) => {
-            const aId = parseInt(a.dataset.id);
-            const bId = parseInt(b.dataset.id);
-            console.log('Comparando IDs:', aId, bId);
-            return aId - bId;
-        });
-        
-        // Limpiar y reconstruir la tabla
-        const addRow = document.querySelector('.add-row');
-        tbody.innerHTML = '';
-        if (addRow) tbody.appendChild(addRow);
-        sortedRows.forEach(row => tbody.appendChild(row));
-    }
-
-    // Inicializar los tipos predominantes de archivos
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log('DOM cargado'); // Debug log
-        
-        const rows = document.querySelectorAll('#report-list tr:not(.add-row)');
-        rows.forEach(row => {
-            const mediaFiles = JSON.parse(row.dataset.mediaFiles || '[]');
-            if (mediaFiles.length > 0) {
-                row.dataset.predominantType = getPredominantFileType(mediaFiles);
-            }
-        });
     });
-  </script>
+});
+</script>
 @endsection
