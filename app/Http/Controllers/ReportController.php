@@ -147,17 +147,132 @@ class ReportController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Report $report)
+    public function edit($id)
     {
-        //
+        \Log::info('Método edit llamado', [
+            'id' => $id,
+            'auth_check' => auth()->check(),
+            'user' => auth()->user()
+        ]);
+        
+        try {
+            // Cargar el reporte con sus archivos multimedia
+            $reporte = Report::with('media_files')->findOrFail($id);
+            
+            \Log::info('Reporte encontrado', [
+                'reporte_id' => $reporte->id,
+                'title' => $reporte->title,
+                'media_files_count' => $reporte->media_files->count()
+            ]);
+            
+            // Pasar el reporte a la vista create en modo edición
+            return view('report.create', [
+                'reporte' => $reporte,
+                'isReadOnly' => false,
+                'isEdit' => true
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Error en edit method: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
+            return redirect()->route('reporte.index')
+                ->with('error', 'Error al cargar el reporte para edición: ' . $e->getMessage());
+        }
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Report $report)
+    public function update(Request $request, $id)
     {
-        //
+        \Log::info('Método update llamado', [
+            'id' => $id,
+            'request_data' => $request->all()
+        ]);
+
+        try {
+            // Buscar el reporte específico
+            $report = Report::findOrFail($id);
+            
+            \Log::info('Reporte encontrado para actualizar', [
+                'id' => $report->id,
+                'current_title' => $report->title,
+                'current_text' => $report->text,
+                'current_date' => $report->report_date
+            ]);
+
+            $request->validate([
+                'title' => 'required|string|max:255',
+                'content' => 'required|string',
+                'report_date' => 'required|date',
+                'media.*' => 'nullable|file|max:10240' // 10MB máximo por archivo
+            ]);
+
+            // Actualizar los datos básicos del reporte
+            $report->title = $request->input('title');
+            $report->text = $request->input('content');
+            $report->report_date = $request->input('report_date');
+            
+            \Log::info('Datos a actualizar', [
+                'title' => $report->title,
+                'text' => $report->text,
+                'report_date' => $report->report_date
+            ]);
+
+            $saved = $report->save();
+
+            \Log::info('Resultado de la actualización', [
+                'saved' => $saved,
+                'updated_report' => $report->fresh()->toArray()
+            ]);
+
+            // Procesar nuevos archivos si existen
+            if ($request->hasFile('media')) {
+                foreach ($request->file('media') as $file) {
+                    $path = $file->store('public/reports/' . $report->id);
+                    $mediaFile = $report->media_files()->create([
+                        'file_path' => str_replace('public/', '', $path),
+                        'file_name' => $file->getClientOriginalName(),
+                        'file_type' => $file->getMimeType(),
+                        'file_size' => $file->getSize()
+                    ]);
+
+                    \Log::info('Archivo multimedia agregado', [
+                        'file_name' => $file->getClientOriginalName(),
+                        'file_type' => $file->getMimeType(),
+                        'media_file_id' => $mediaFile->id
+                    ]);
+                }
+            }
+
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Reporte actualizado exitosamente',
+                    'redirect' => route('reporte.index')
+                ]);
+            }
+
+            return redirect()->route('reporte.index')
+                ->with('success', 'Reporte actualizado exitosamente');
+        } catch (\Exception $e) {
+            \Log::error('Error al actualizar el reporte: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+                'request_data' => $request->all(),
+                'id' => $id
+            ]);
+
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error al actualizar el reporte: ' . $e->getMessage()
+                ], 422);
+            }
+
+            return redirect()->back()
+                ->with('error', 'Error al actualizar el reporte: ' . $e->getMessage())
+                ->withInput();
+        }
     }
 
     /**

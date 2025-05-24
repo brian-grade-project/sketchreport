@@ -320,7 +320,7 @@
             <img src="/img/file-import2.svg" alt="file_import" 
                 class="w-20 h-20 md:w-24 md:h-24 lg:w-28 lg:h-28 xl:w-32 xl:h-32 2xl:w-36 2xl:h-36 object-contain">
         </div>
-        <div class="w-[60%] h-[100%] bg-zinc-800 rotate-45 relative top-60 right-0 left-28"></div>
+            <div class="w-[60%] h-[100%] bg-zinc-800 rotate-45 relative top-60 right-0 left-28"></div>
         </div>
     </div>
 </div>

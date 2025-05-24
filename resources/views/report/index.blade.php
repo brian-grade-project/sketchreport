@@ -38,7 +38,7 @@
           </div>
         </div>
       </div>
-
+        
       <div class="overflow-y-auto flex-1 pr-2">
         <table class="w-full border-separate bg-zinc-800 mb-5 rounded-md p-5">
             <thead class="sticky top-0 bg-zinc-800 z-10">
@@ -120,7 +120,8 @@
                            class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-full text-sm">
                             Ver
                         </a>
-                        <a href="{{ route('reporte.edit', $reporte) }}" class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded-full text-sm">
+                        <a href="{{ url('reporte/' . $reporte->id . '/edit') }}" 
+                           class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded-full text-sm">
                             Editar
                         </a>
                         <form action="{{ route('reporte.destroy', $reporte) }}" method="POST" class="inline">
@@ -135,16 +136,16 @@
                 </td>
             </tr>
             @endforeach
-        </tbody>
-        </table>
+         </tbody>
+         </table>
     </div>
-
+ 
     <div class="mt-4">
        {{ $reportes->links() }}
     </div>
 </div>
 
-<script>
+  <script>
     // Función para mostrar/ocultar el dropdown
     const filterButton = document.querySelector('.relative button');
     const dropdownContent = document.getElementById('dropdown-content');
@@ -294,5 +295,5 @@
             }
         });
     });
-</script>
+  </script>
 @endsection

@@ -1,14 +1,20 @@
 @extends('layout.master')
 
-@section('title', isset($isReadOnly) ? 'Ver Reporte' : 'Crear Reporte')
+@section('title', isset($isReadOnly) && $isReadOnly ? 'Ver Reporte' : (isset($isEdit) ? 'Editar Reporte' : 'Crear Reporte'))
 
 @section('content')
 <div class="w-[100vw] min-h-[100vh] bg-[url(/img/imglogin.jpg)] bg-no-repeat bg-cover pt-5 pb-10 relative">
     <div class="bg-black/20 backdrop-blur-sm absolute inset-0 w-full h-full"></div>
     <div class="w-[80%] min-h-[90%] bg-zinc-800 m-auto mt-5 mb-10 relative overflow-y-auto rounded-3xl flex">
 
-    <form id="reportForm" class="flex flex-row flex-auto flex-wrap relative float-left lg:w-[62%] md:w-[60%] p-4" action="{{ isset($isReadOnly) ? '#' : route('reporte.store') }}" method="POST" enctype="multipart/form-data">
+    <form id="reportForm" class="flex flex-row flex-auto flex-wrap relative float-left lg:w-[62%] md:w-[60%] p-4" 
+          action="{{ isset($reporte) ? route('reporte.update', $reporte->id) : route('reporte.store') }}" 
+          method="POST" 
+          enctype="multipart/form-data">
         @csrf
+        @if(isset($reporte))
+            @method('PUT')
+        @endif
 
         <div class="absolute left-[2%] top-[2%] w-[15%] h-[10%]">
            <a href="{{ url()->previous() }}" class="block">
@@ -20,7 +26,7 @@
                 <label for="title" class="text-xl text-orange-600 block ml-5 mt-10 pb-1 font-light">Título del reporte</label>
                 <input type="text" class="bg-white rounded-full w-full p-1" name="title" id="title" 
                     value="{{ isset($reporte) ? $reporte->title : '' }}"
-                    {{ isset($isReadOnly) ? 'readonly' : '' }}
+                    {{ isset($isReadOnly) && $isReadOnly ? 'readonly' : '' }}
                     placeholder="Ingrese título">
             </div>
         
@@ -28,17 +34,17 @@
                 <label for="report_date" class="text-xl text-orange-600 block mt-10 ml-4 font-light pb-1">Fecha</label>
                 <input type="date" class="bg-white rounded-full w-full p-1" name="report_date" id="report_date"
                     value="{{ isset($reporte) ? $reporte->report_date->format('Y-m-d') : '' }}"
-                    {{ isset($isReadOnly) ? 'readonly' : '' }}>
+                    {{ isset($isReadOnly) && $isReadOnly ? 'readonly' : '' }}>
             </div>
 
             <div class="relative float-left mt-8 ml-16 w-[86%]">
                 <label for="content" class="text-xl text-orange-600 block pb-1 font-light">Contenido del reporte</label>
                 <textarea class="bg-white rounded-lg w-full p-4 min-h-[200px] resize-y" name="content" id="content" 
-                    {{ isset($isReadOnly) ? 'readonly' : '' }}
+                    {{ isset($isReadOnly) && $isReadOnly ? 'readonly' : '' }}
                     placeholder="Ingrese el contenido del reporte">{{ isset($reporte) ? $reporte->text : '' }}</textarea>
             </div>
 
-            @if(!isset($isReadOnly))
+            @if(!isset($isReadOnly) || !$isReadOnly)
             <div class="relative float-left mt-8 ml-16 w-[40%]">
                 <label for="media" class="text-xl text-orange-600 block pb-1 font-light">Archivos multimedia</label>
                 <input type="file" multiple class="resize-none bg-white rounded w-full h-10 rounded-full" name="media[]" id="media" accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt">
@@ -67,7 +73,7 @@
                                 @else
                                     <div class="w-full aspect-square bg-zinc-600 rounded-lg flex items-center justify-center">
                                         <svg class="w-16 h-16 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2,0,0,0,2-2V9.414a1 1,0,0,0-.293-.707l-5.414-5.414A1 1,0,0,0,12.586 3H7a2 2,0,0,0-2 2v14a2 2,0,0,0,2 2z"></path>
                                             <text x="8" y="18" class="text-xs fill-current">{{ strtoupper(pathinfo($media->file_path, PATHINFO_EXTENSION)) }}</text>
                                         </svg>
                                     </div>
@@ -77,7 +83,7 @@
                         @endforeach
                     @endif
 
-                    @if(!isset($isReadOnly))
+                    @if(!isset($isReadOnly) || !$isReadOnly)
                     <!-- Botón de agregar más -->
                     <div class="relative bg-zinc-700 rounded-lg p-2">
                         <button type="button" onclick="document.getElementById('media').click()" 
@@ -92,14 +98,18 @@
                 </div>
             </div>
 
-            @if(!isset($isReadOnly))
+            @if(!isset($isReadOnly) || !$isReadOnly)
             <div class="relative w-[100%] flex flex-row mt-16 mb-8">
                 <div class="relative block ml-16 lg:w-[25%] md:w-[25%] rounded-full">
-                    <button type="submit" class="btn-sm text-center bg-orange-600 w-full rounded-full text-xl font-light h-full hover:bg-orange-700 hover:text-white hover:font-semibold">Guardar</button>
+                    <button type="submit" class="btn-sm text-center bg-orange-600 w-full rounded-full text-xl font-light h-full hover:bg-orange-700 hover:text-white hover:font-semibold">
+                        {{ isset($isEdit) ? 'Actualizar' : 'Guardar' }}
+                    </button>
                 </div>
 
                 <div class="relative block ml-16 lg:w-[45%] md:w-[45%] rounded-full">
-                    <button type="submit" name="export" value="1" class="btn-sm text-center bg-orange-600 w-full rounded-full text-xl font-light h-full hover:bg-orange-700 hover:text-white hover:font-semibold">Guardar y Exportar</button>
+                    <button type="submit" name="export" value="1" class="btn-sm text-center bg-orange-600 w-full rounded-full text-xl font-light h-full hover:bg-orange-700 hover:text-white hover:font-semibold">
+                        {{ isset($isEdit) ? 'Actualizar y Exportar' : 'Guardar y Exportar' }}
+                    </button>
                 </div>
             </div>
             @endif
@@ -114,10 +124,10 @@
         </div>
         <div class="w-[60%] h-[100%] bg-zinc-800 rotate-45 relative top-60 right-0 left-28"></div>
     </div>
-    </div>
+</div>
 </div>
 
-@if(!isset($isReadOnly))
+@if(!isset($isReadOnly) || !$isReadOnly)
 <script>
 // Función para crear vista previa de archivos
 function createPreview(file) {
@@ -282,4 +292,4 @@ function handleFiles(e) {
 document.getElementById('media').addEventListener('change', handleFiles);
 </script>
 @endif
-@endsection 
+@endsection

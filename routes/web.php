@@ -18,7 +18,7 @@ use App\Http\Controllers\MultimediaController;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('inicio');
 });
 
 Route::get('ingresar', [LoginController::class, 'login'])->name('login');
