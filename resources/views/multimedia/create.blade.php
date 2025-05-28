@@ -12,7 +12,7 @@
         @csrf
         
         <div class="absolute left-[2%] top-[2%] w-[15%] h-[10%]">
-           <a href="{{ url()->previous() }}" class="block">
+           <a href="{{ route('home') }}" class="block">
            <svg class="w-[40%] fill-orange-600 hover:bg-orange-600 hover:fill-zinc-800 transition-all duration-500 ease-in-out rounded-full" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g id="arrow-left"><path d="M11,18.75a.74.74,0,0,1-.53-.22l-6-6a.75.75,0,0,1,0-1.06l6-6a.75.75,0,0,1,1.06,1.06L6.06,12l5.47,5.47a.75.75,0,0,1,0,1.06A.74.74,0,0,1,11,18.75Z"/><path d="M19,12.75H5a.75.75,0,0,1,0-1.5H19a.75.75,0,0,1,0,1.5Z"/></g></svg>
            </a>
         </div>
@@ -33,6 +33,8 @@
             </div>
 
             <script>
+            console.log('Script multimedia/create.blade.php loaded');
+
             function handleDrop(e) {
                 console.log('Drop event triggered');
                 e.preventDefault();
@@ -101,14 +103,18 @@
                 // Asegurarse de que la sección de vista previa sea visible
                 previewSection.classList.remove('hidden');
                 
-                // No limpiar el contenedor para mantener los archivos existentes
-                // previewContainer.innerHTML = '';
+                // Limpiar el contenedor excepto el botón de agregar
+                const addButton = previewContainer.querySelector('button');
+                previewContainer.innerHTML = '';
+                if (addButton) {
+                    previewContainer.appendChild(addButton);
+                }
                 
                 files.forEach((file, index) => {
                     console.log(`Processing file ${index + 1}:`, file.name, 'Type:', file.type);
                     const preview = createPreview(file);
                     if (preview) {
-                        previewContainer.appendChild(preview);
+                        previewContainer.insertBefore(preview, addButton);
                         console.log(`Preview added for file ${index + 1}`);
                     } else {
                         console.log(`Failed to create preview for file ${index + 1}`);
@@ -307,7 +313,7 @@
                 </div>
 
                 <div class="relative block ml-16 lg:w-[45%] md:w-[45%] rounded-full">
-                    <button type="submit" name="export" value="1" class="btn-sm text-center bg-orange-600 w-full rounded-full text-xl font-light h-full hover:bg-orange-700 hover:text-white hover:font-semibold">Guardar y Exportar</button>
+                    <button type="button" id="saveAndExportBtn" class="btn-sm text-center bg-orange-600 w-full rounded-full text-xl font-light h-full hover:bg-orange-700 hover:text-white hover:font-semibold">Guardar y Exportar</button>
                 </div>
             </div>
     </form>   
@@ -325,4 +331,277 @@
     </div>
 </div>
 
+<script>
+console.log('Script multimedia/create.blade.php loaded');
+
+// Agregar el event listener para el input de archivos
+document.getElementById('media').addEventListener('change', handleFiles);
+
+// Funciones auxiliares (pueden estar fuera del DOMContentLoaded si no interactúan directamente con el DOM al inicio)
+// Función para crear vista previa de archivos
+function createPreview(file) {
+    console.log('Creating preview for:', file.name);
+    const div = document.createElement('div');
+    div.className = 'relative bg-zinc-700 rounded-lg p-2 group';
+    
+    // Botón de eliminar
+    const deleteButton = document.createElement('button');
+    deleteButton.className = 'absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-red-600 z-10';
+    deleteButton.innerHTML = '×';
+    deleteButton.onclick = function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        removeFile(file);
+        div.remove();
+    };
+    div.appendChild(deleteButton);
+    
+    const preview = document.createElement('div');
+    preview.className = 'aspect-square bg-zinc-600 rounded-lg overflow-hidden';
+    
+    const fileType = file.type.split('/')[0];
+    console.log('File type:', fileType);
+    
+    try {
+        if (fileType === 'image') {
+            const img = document.createElement('img');
+            img.className = 'w-full h-full object-cover';
+            img.file = file;
+            preview.appendChild(img);
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                img.src = e.target.result;
+                console.log('Image preview loaded for:', file.name);
+            };
+            reader.onerror = (error) => {
+                console.error('Error loading image:', error);
+            };
+            reader.readAsDataURL(file);
+        } else if (fileType === 'video') {
+            const video = document.createElement('video');
+            video.className = 'w-full h-full object-cover';
+            video.controls = true;
+            video.src = URL.createObjectURL(file);
+            preview.appendChild(video);
+            console.log('Video preview created for:', file.name);
+        } else if (fileType === 'audio') {
+            const audio = document.createElement('audio');
+            audio.className = 'w-full';
+            audio.controls = true;
+            audio.src = URL.createObjectURL(file);
+            preview.appendChild(audio);
+            console.log('Audio preview created for:', file.name);
+        } else {
+            // Para documentos y otros tipos de archivo
+            const icon = document.createElement('div');
+            icon.className = 'w-full h-full flex items-center justify-center';
+            
+            // Determinar el ícono basado en la extensión del archivo
+            const extension = file.name.split('.').pop().toLowerCase();
+            let iconSvg = '';
+            
+            switch(extension) {
+                case 'pdf':
+                    iconSvg = `<svg class="w-16 h-16 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                        <text x="8" y="18" class="text-xs fill-current">PDF</text>
+                    </svg>`;
+                    break;
+                case 'doc':
+                case 'docx':
+                    iconSvg = `<svg class="w-16 h-16 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                        <text x="8" y="18" class="text-xs fill-current">DOC</text>
+                    </svg>`;
+                    break;
+                default:
+                    iconSvg = `<svg class="w-16 h-16 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                        <text x="8" y="18" class="text-xs fill-current">${extension.toUpperCase()}</text>
+                    </svg>`;
+            }
+            
+            icon.innerHTML = iconSvg;
+            preview.appendChild(icon);
+            console.log('Document preview created for:', file.name);
+        }
+
+        const info = document.createElement('div');
+        info.className = 'mt-2 text-white text-sm truncate';
+        info.textContent = file.name;
+        
+        div.appendChild(preview);
+        div.appendChild(info);
+        
+        return div;
+    } catch (error) {
+        console.error('Error creating preview:', error);
+        return null;
+    }
+}
+
+function removeFile(fileToRemove) {
+    const fileInput = document.getElementById('media');
+    const dt = new DataTransfer();
+    const files = fileInput.files;
+
+    for (let i = 0; i < files.length; i++) {
+        if (files[i] !== fileToRemove) {
+            dt.items.add(files[i]);
+        }
+    }
+
+    fileInput.files = dt.files;
+    console.log('File removed:', fileToRemove.name);
+}
+
+function handleFiles(e) {
+    console.log('handleFiles called');
+    const files = [...e.target.files];
+    console.log('Files in handleFiles:', files.length);
+
+    if (files.length === 0) {
+        console.log('No files to process');
+        return;
+    }
+
+    const previewSection = document.getElementById('previewSection');
+    const previewContainer = document.getElementById('previewContainer');
+
+    // Remove all dynamically added previews, keep existing media and the add button placeholder
+    // Note: The add button is removed and re-added later, so we just clear the content here.
+    while (previewContainer.lastChild) {
+        previewContainer.removeChild(previewContainer.lastChild);
+    }
+
+    // Remover el botón de agregar si existe
+    const addButton = previewContainer.querySelector('.relative.bg-zinc-700.rounded-lg.p-2');
+    if (addButton) {
+        addButton.remove();
+    }
+
+    files.forEach(file => {
+        const preview = createPreview(file);
+        if (preview) {
+            previewContainer.appendChild(preview);
+        }
+    });
+
+    // Agregar el botón de agregar al final
+    const addButtonDiv = document.createElement('div');
+    addButtonDiv.className = 'relative bg-zinc-700 rounded-lg p-2';
+    addButtonDiv.innerHTML = `
+        <button type="button" onclick="document.getElementById('media').click()" 
+                class="w-full aspect-square bg-zinc-600 rounded-lg flex items-center justify-center hover:bg-zinc-500 transition-colors duration-200 group">
+            <div class="w-12 h-12 border-4 border-orange-600 rounded-full flex items-center justify-center group-hover:border-orange-500">
+                <svg class="w-8 h-8 fill-orange-600 group-hover:fill-orange-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g id="plus"><path d="M12.75,11.25V5a.75.75,0,0,0-1.5,0v6.25H5a.75.75,0,0,0,0,1.5h6.25V19a.76.76,0,0,0,.75.75.75.75,0,0,0,.75-.75V12.75H19a.75.75,0,0,0,.75-.75.76.76,0,0,0-.75-.75Z"/></g></svg>
+            </div>
+        </button>
+        <div class="mt-2 text-white text-sm text-center">Agregar archivo</div>
+    `;
+    previewContainer.appendChild(addButtonDiv);
+}
+
+// Script para manejar el botón de Guardar y Exportar
+document.getElementById('saveAndExportBtn').addEventListener('click', async function(event) {
+    console.log('Save and Export button clicked');
+    event.preventDefault();
+
+    const form = document.getElementById('multimediaForm');
+    const formData = new FormData(form);
+    const actionUrl = form.getAttribute('action');
+    const saveBtn = form.querySelector('button[type="submit"]');
+    const saveExportBtn = document.getElementById('saveAndExportBtn');
+
+    // Deshabilitar botones
+    if (saveBtn) saveBtn.disabled = true;
+    saveExportBtn.disabled = true;
+    saveExportBtn.textContent = 'Procesando...';
+
+    try {
+        console.log('Iniciando guardado de multimedia...');
+        // Paso 1: Guardar los archivos multimedia
+        const response = await fetch(actionUrl, {
+            method: form.getAttribute('method'),
+            body: formData,
+            headers: {
+                'X-CSRF-TOKEN': form.querySelector('input[name="_token"]').value,
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            credentials: 'same-origin'
+        });
+
+        console.log('Respuesta recibida:', response);
+        
+        // Verificar si la respuesta es JSON
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            const text = await response.text();
+            console.error('Respuesta no JSON:', text);
+            throw new Error('La respuesta del servidor no es JSON. Tipo de contenido: ' + contentType);
+        }
+
+        const data = await response.json();
+        console.log('Datos recibidos:', data);
+
+        if (data.success) {
+            console.log('Multimedia guardada exitosamente');
+            // Paso 2: Si el guardado fue exitoso, iniciar la descarga del ZIP
+            if (data.multimedia_ids && data.multimedia_ids.length > 0) {
+                console.log('Iniciando descarga del ZIP para multimedia:', data.multimedia_ids);
+                // Construir la URL de exportación con los IDs de multimedia
+                const exportUrl = '{{ route('multimedia.export') }}' + '?ids=' + data.multimedia_ids.join(',');
+                
+                // Crear un iframe oculto para la descarga
+                const iframe = document.createElement('iframe');
+                iframe.style.display = 'none';
+                document.body.appendChild(iframe);
+                
+                // Iniciar la descarga
+                iframe.src = exportUrl;
+                
+                // Remover el iframe después de un tiempo
+                setTimeout(() => {
+                    document.body.removeChild(iframe);
+                }, 5000);
+
+                // Redirigir al índice después de iniciar la descarga
+                // Añadimos un pequeño retardo para dar tiempo a que inicie la descarga
+                // TEMPORALMENTE DESHABILITADO PARA DEPURACIÓN
+                setTimeout(() => {
+                     window.location.href = '{{ route('multimedia.index') }}';
+                }, 200); // Retardo de 200 milisegundos
+
+            } else {
+                 // Si no hay IDs para exportar, solo redirigir
+                 console.log('No multimedia IDs received for export, redirecting...');
+                 // TEMPORALMENTE DESHABILITADO PARA DEPURACIÓN
+                 setTimeout(() => {
+                      window.location.href = '{{ route('multimedia.index') }}';
+                 }, 200);
+            }
+        } else {
+            // Mostrar error si el guardado falló
+            let errorMessage = data.message || 'Error desconocido al guardar multimedia.';
+            if (data.errors) {
+                for (const field in data.errors) {
+                    errorMessage += '\n- ' + data.errors[field].join(', ');
+                }
+            }
+            throw new Error(errorMessage);
+        }
+    } catch (error) {
+        console.error('Error detallado:', error);
+        alert('Error: ' + error.message);
+    } finally {
+        // Re-habilitar botones
+        if (saveBtn) saveBtn.disabled = false;
+        saveExportBtn.disabled = false;
+        saveExportBtn.textContent = 'Guardar y Exportar';
+    }
+});
+
+</script>
 @endsection

@@ -12,8 +12,8 @@ class HomeController extends Controller
     //
     public function inicio(): View
     {
-        $reportes = Report::latest()->take(10)->get();
-        $multimedias = Multimedia::latest()->take(10)->get();
+        $reportes = Report::latest()->take(7)->get();
+        $multimedias = Multimedia::latest()->take(7)->get();
 
         // dd($reportes);
         return view('auth.inicio', compact('reportes', 'multimedias'));

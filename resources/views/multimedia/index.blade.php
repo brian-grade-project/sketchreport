@@ -7,6 +7,55 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lista de Multimedia</title>
+  <style>
+    /* Estilos personalizados para la paginación */
+    .pagination {
+        display: flex;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-top: 1rem;
+        padding: 1rem;
+        background-color: rgb(234 88 12); /* bg-orange-600 */
+        border-radius: 0.5rem;
+    }
+    
+    .pagination > * {
+        padding: 0.5rem 1rem;
+        border-radius: 9999px;
+        background-color: rgb(39 39 42); /* bg-zinc-800 */
+        color: rgb(234 88 12); /* text-orange-600 */
+        transition: all 0.2s;
+        text-decoration: none;
+    }
+    
+    .pagination > *:hover {
+        background-color: rgb(39 39 42); /* bg-zinc-800 */
+        color: rgb(234 88 12); /* text-orange-600 */
+        transform: scale(1.05);
+    }
+    
+    .pagination .active {
+        background-color: rgb(39 39 42); /* bg-zinc-800 */
+        color: rgb(234 88 12); /* text-orange-600 */
+        font-weight: bold;
+    }
+    
+    .pagination .disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        pointer-events: none;
+    }
+
+    /* Estilos para los enlaces de la paginación */
+    .pagination a {
+        text-decoration: none;
+    }
+
+    /* Estilos para el texto de la paginación */
+    .pagination span {
+        display: inline-block;
+    }
+  </style>
 </head>
 <body>
 <div class="w-[100vw] h-[100vh] bg-[url(/img/imglogin.jpg)] bg-no-repeat bg-cover bg-fixed pt-5 relative">
@@ -15,7 +64,7 @@
     <div class="w-[80%] md:w-[90%] h-[80vh] bg-orange-600 m-auto mt-5 p-8 pt-3 rounded-xl relative shadow-xl overflow-hidden flex flex-col">
 
       <div class="w-[15%] h-[10%] md:h-[5%] mb-5 md:mb-5 lg:mb-7 lg:mt-1 xl:mb-10 xl:w-[14%] 2xl:mb-12">
-          <a href="{{ url()->previous() }}">
+          <a href="{{ route('home') }}" class="block">
           <svg class="w-[30%] fill-zinc-800 hover:bg-zinc-800 hover:fill-orange-600 transition-all duration-500 ease-in-out rounded-full" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g id="arrow-left"><path d="M11,18.75a.74.74,0,0,1-.53-.22l-6-6a.75.75,0,0,1,0-1.06l6-6a.75.75,0,0,1,1.06,1.06L6.06,12l5.47,5.47a.75.75,0,0,1,0,1.06A.74.74,0,0,1,11,18.75Z"/><path d="M19,12.75H5a.75.75,0,0,1,0-1.5H19a.75.75,0,0,1,0,1.5Z"/></g></svg>
           </a>
       </div>
@@ -109,17 +158,17 @@
                     </div>
                     <!-- Action Buttons -->
                     <div class="flex justify-center space-x-2">
-                        <a href="{{ route('multimedia.show', $multimedia) }}" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-full text-sm">
+                        <a href="{{ asset('storage/' . $multimedia->path) }}" 
+                           target="_blank" 
+                           class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-full text-sm">
                             Ver
                         </a>
-                        <a href="{{ route('multimedia.edit', $multimedia) }}" class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded-full text-sm">
-                            Editar
-                        </a>
-                        <form action="{{ route('multimedia.destroy', $multimedia) }}" method="POST" class="inline">
+                        <form action="{{ route('multimedia.destroy', $multimedia) }}" method="POST" class="inline" id="deleteForm-{{ $multimedia->id }}">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-full text-sm" 
-                                    onclick="return confirm('¿Estás seguro de eliminar este multimedia?')">
+                            <button type="button" 
+                                    onclick="confirmDelete('{{ $multimedia->id }}', '{{ $multimedia->text }}')"
+                                    class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-full text-sm">
                                 Eliminar
                             </button>
                         </form>
@@ -131,18 +180,80 @@
          </table>
     </div>
  
-      <div class="mt-4">
-         {{ $multimedias->links() }}
+      <div class="mt-4 bg-orange-600 p-4 rounded-lg">
+         {{ $multimedias->links('pagination::tailwind') }}
       </div>
     </div>
 
     @if(session('success'))
-    <div class="fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg">
+    <div id="successMessage" class="fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg">
         {{ session('success') }}
     </div>
     @endif
 
+    <!-- Diálogo de confirmación -->
+    <div id="deleteConfirmDialog" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-zinc-800 p-6 rounded-lg shadow-xl max-w-md w-full mx-4">
+            <h3 class="text-xl font-semibold text-orange-600 mb-4">Confirmar Eliminación</h3>
+            <p class="text-orange-600 mb-6">¿Estás seguro de que deseas eliminar el archivo "<span id="multimediaTitle" class="font-semibold"></span>"? Esta acción no se puede deshacer.</p>
+            <div class="flex justify-end space-x-4">
+                <button onclick="closeDeleteDialog()" 
+                        class="bg-zinc-700 hover:bg-zinc-600 text-orange-600 px-4 py-2 rounded-lg transition-colors duration-200">
+                    Cancelar
+                </button>
+                <button onclick="deleteMultimedia()" 
+                        class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors duration-200">
+                    Eliminar
+                </button>
+            </div>
+        </div>
+    </div>
+
   <script>
+        // Código para el mensaje de éxito
+        const successMessage = document.getElementById('successMessage');
+        if (successMessage) {
+            setTimeout(() => {
+                successMessage.style.opacity = '0';
+                successMessage.style.transition = 'opacity 0.5s ease-in-out';
+                setTimeout(() => {
+                    successMessage.remove();
+                }, 500);
+            }, 3000);
+        }
+
+        let multimediaToDelete = null;
+
+        function confirmDelete(id, title) {
+            multimediaToDelete = id;
+            document.getElementById('multimediaTitle').textContent = title;
+            document.getElementById('deleteConfirmDialog').classList.remove('hidden');
+            document.getElementById('deleteConfirmDialog').classList.add('flex');
+        }
+
+        function closeDeleteDialog() {
+            document.getElementById('deleteConfirmDialog').classList.add('hidden');
+            document.getElementById('deleteConfirmDialog').classList.remove('flex');
+            multimediaToDelete = null;
+        }
+
+        function deleteMultimedia() {
+            if (multimediaToDelete) {
+                const form = document.getElementById('deleteForm-' + multimediaToDelete);
+                if (form) {
+                    form.submit();
+                }
+            }
+            closeDeleteDialog();
+        }
+
+        // Cerrar el diálogo si se hace clic fuera de él
+        document.getElementById('deleteConfirmDialog').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeDeleteDialog();
+            }
+        });
+
         // Función para mostrar/ocultar el dropdown
         document.querySelector('button').addEventListener('click', function(e) {
             e.stopPropagation();

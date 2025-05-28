@@ -8,6 +8,9 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use ZipArchive;
+use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Log;
 
 class MultimediaController extends Controller
 {
@@ -42,7 +45,7 @@ class MultimediaController extends Controller
                 'media.*' => [
                     'required',
                     'file',
-                    'max:102400', // 100MB máximo
+                    'max:102400', // 100MB máximo por archivo
                     function ($attribute, $value, $fail) {
                         $allowedMimeTypes = [
                             // Imágenes
@@ -78,9 +81,32 @@ class MultimediaController extends Controller
                 ],
             ]);
 
+            // Validar el tamaño total de los archivos
+            $totalSize = 0;
+            if ($request->hasFile('media')) {
+                 foreach ($request->file('media') as $file) {
+                    $totalSize += $file->getSize();
+                }
+            }
+
+            // Convertir a MB
+            $totalSizeMB = $totalSize / 1024 / 1024;
+            if ($totalSizeMB > 100) {
+                 // Si es una solicitud AJAX o se solicita JSON
+                if ($request->ajax() || $request->wantsJson()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'El tamaño total de los archivos no puede exceder 100MB.'
+                    ], 422);
+                }
+                return back()->with('error', 'El tamaño total de los archivos no puede exceder 100MB.');
+            }
+
             $files = $request->file('media');
             $savedFiles = [];
+            $multimediaIds = [];
 
+            if ($files) {
             foreach ($files as $file) {
                 // Procesar el archivo según su tipo
                 $handler = new FileTypeHandler($file);
@@ -88,7 +114,7 @@ class MultimediaController extends Controller
 
                 // Crear registro en la base de datos
                 $multimedia = Multimedia::create([
-                    'report_id' => $request->report_id,
+                        'report_id' => $request->report_id, // Assuming report_id can be passed here if associated with a report
                     'path' => $result['path'],
                     'thumbnail' => $result['thumbnail'] ?? null,
                     'type' => $result['type'],
@@ -98,12 +124,30 @@ class MultimediaController extends Controller
                 ]);
 
                 $savedFiles[] = $multimedia;
+                    $multimediaIds[] = $multimedia->id;
+                }
+            }
+
+            // Si es una solicitud AJAX o se solicita JSON
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Archivos multimedia guardados exitosamente.',
+                    'multimedia_ids' => $multimediaIds
+                ]);
             }
 
             return redirect()->route('multimedia.index')
                 ->with('success', 'Archivos multimedia guardados exitosamente.');
 
         } catch (Exception $e) {
+             // Si es una solicitud AJAX o se solicita JSON
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error al guardar los archivos: ' . $e->getMessage()
+                ], 422);
+            }
             return back()->with('error', 'Error al guardar los archivos: ' . $e->getMessage());
         }
     }
@@ -252,6 +296,124 @@ class MultimediaController extends Controller
             return 'audio';
         } else {
             return 'documento';
+        }
+    }
+
+    /**
+     * Export the specified multimedia files as a ZIP file.
+     */
+    public function export(Request $request)
+    {
+        Log::info('Método export multimedia llamado', ['request_data' => $request->all()]);
+        $multimediaIds = $request->input('ids'); // Expecting a comma-separated string of multimedia IDs
+
+        if (!is_string($multimediaIds) || empty($multimediaIds)) {
+             return response()->json([
+                'success' => false,
+                'message' => 'No se proporcionaron IDs de multimedia para exportar.'
+            ], 400);
+        }
+
+        $idsArray = explode(',', $multimediaIds);
+        $idsArray = array_filter($idsArray); // Remove empty strings
+
+        if (empty($idsArray)) {
+             return response()->json([
+                'success' => false,
+                'message' => 'No se proporcionaron IDs de multimedia válidos para exportar.'
+            ], 400);
+        }
+
+        try {
+            $multimedias = Multimedia::whereIn('id', $idsArray)->get();
+
+            if ($multimedias->isEmpty()) {
+                 return response()->json([
+                    'success' => false,
+                    'message' => 'No se encontraron archivos multimedia con los IDs proporcionados.'
+                ], 404);
+            }
+
+            // Get title and date from the first multimedia item (assuming consistency for the group)
+            $titulo = $multimedias->first()->text ?? 'Sin Título';
+            $fecha = $multimedias->first()->media_date ? $multimedias->first()->media_date->format('Y-m-d') : 'Sin Fecha';
+
+            // Generate report text content
+            $multimediaContent = "Título del Grupo: " . $titulo . "\n";
+            $multimediaContent .= "Fecha: " . $fecha . "\n\n";
+            $multimediaContent .= "Archivos Incluidos:\n";
+            foreach ($multimedias as $media) {
+                 $multimediaContent .= "- " . $media->text . '.' . pathinfo($media->path, PATHINFO_EXTENSION) . "\n";
+            }
+
+            // Create a temporary file for the multimedia group info
+            $textFileName = 'informacion_multimedia.txt';
+            $tempTextFilePath = tempnam(sys_get_temp_dir(), 'multimedia_txt_export');
+            file_put_contents($tempTextFilePath, $multimediaContent);
+
+            // Create a temporary directory for the zip file
+            $zipFileName = 'multimedia_' . now()->format('Ymd_His') . '.zip';
+            $tempZipFilePath = tempnam(sys_get_temp_dir(), 'multimedia_zip_export');
+            // Delete the temporary file created by tempnam, we only need the name
+            unlink($tempZipFilePath);
+            $tempZipFilePath .= '.zip'; // Add .zip extension
+
+            $zip = new ZipArchive();
+
+            if ($zip->open($tempZipFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) === TRUE) {
+                // Add the multimedia info text file to the zip
+                $zip->addFile($tempTextFilePath, $textFileName);
+
+                // Add associated media files to the zip
+                foreach ($multimedias as $media) {
+                    $storagePath = 'public/' . $media->path;
+                    if (Storage::exists($storagePath)) {
+                        $mediaContent = Storage::get($storagePath);
+                        // Use the original file name for the zip entry
+                        $zip->addFromString('archivos/' . $media->text . '.' . pathinfo($media->path, PATHINFO_EXTENSION), $mediaContent);
+                    } else {
+                        // Log or handle missing files
+                         // Optionally add a placeholder file in the zip
+                         $zip->addFromString('archivos/' . $media->text . '.' . pathinfo($media->path, PATHINFO_EXTENSION) . '.missing', 'Archivo no encontrado');
+                    }
+                }
+
+                $zip->close();
+
+                // Set appropriate headers for download
+                $headers = [
+                    'Content-Type' => 'application/zip',
+                    'Content-Disposition' => 'attachment; filename="' . $zipFileName . '";',
+                    'Content-Length' => filesize($tempZipFilePath),
+                ];
+
+                // Return the zip file as a download
+                // Delete temporary text file before sending response
+                unlink($tempTextFilePath);
+                return Response::download($tempZipFilePath, $zipFileName, $headers)->deleteFileAfterSend(true);
+
+            } else {
+                 // Clean up temporary text file
+                unlink($tempTextFilePath);
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error al crear el archivo zip.',
+                ], 500);
+            }
+
+        } catch (Exception $e) {
+            // Clean up temporary text file if it was created
+            if (isset($tempTextFilePath) && file_exists($tempTextFilePath)) {
+                unlink($tempTextFilePath);
+            }
+             // Clean up temporary zip file if it was created
+            if (isset($tempZipFilePath) && file_exists($tempZipFilePath)) {
+                 unlink($tempZipFilePath);
+            }
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al exportar los archivos multimedia: ' . $e->getMessage()
+            ], 500);
         }
     }
 }

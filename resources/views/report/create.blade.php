@@ -107,7 +107,7 @@
                 </div>
 
                 <div class="relative block ml-16 lg:w-[45%] md:w-[45%] rounded-full">
-                    <button type="submit" name="export" value="1" class="btn-sm text-center bg-orange-600 w-full rounded-full text-xl font-light h-full hover:bg-orange-700 hover:text-white hover:font-semibold">
+                    <button type="button" id="saveAndExportBtn" class="btn-sm text-center bg-orange-600 w-full rounded-full text-xl font-light h-full hover:bg-orange-700 hover:text-white hover:font-semibold">
                         {{ isset($isEdit) ? 'Actualizar y Exportar' : 'Guardar y Exportar' }}
                     </button>
                 </div>
@@ -124,11 +124,15 @@
         </div>
         <div class="w-[60%] h-[100%] bg-zinc-800 rotate-45 relative top-60 right-0 left-28"></div>
     </div>
-</div>
-</div>
+            </div>
+            </div>
 
 @if(!isset($isReadOnly) || !$isReadOnly)
 <script>
+// Agregar el event listener para el input de archivos
+document.getElementById('media').addEventListener('change', handleFiles);
+
+// Funciones auxiliares (pueden estar fuera del DOMContentLoaded si no interactúan directamente con el DOM al inicio)
 // Función para crear vista previa de archivos
 function createPreview(file) {
     console.log('Creating preview for:', file.name);
@@ -259,6 +263,12 @@ function handleFiles(e) {
 
     const previewSection = document.getElementById('previewSection');
     const previewContainer = document.getElementById('previewContainer');
+
+    // Remove all dynamically added previews, keep existing media and the add button placeholder
+    // Note: The add button is removed and re-added later, so we just clear the content here.
+    while (previewContainer.lastChild) {
+        previewContainer.removeChild(previewContainer.lastChild);
+    }
     
     // Remover el botón de agregar si existe
     const addButton = previewContainer.querySelector('.relative.bg-zinc-700.rounded-lg.p-2');
@@ -288,8 +298,96 @@ function handleFiles(e) {
     previewContainer.appendChild(addButtonDiv);
 }
 
-// Agregar el event listener para el input de archivos
-document.getElementById('media').addEventListener('change', handleFiles);
+// Script para manejar el botón de Guardar y Exportar
+document.getElementById('saveAndExportBtn').addEventListener('click', async function(event) {
+    event.preventDefault();
+
+    const form = document.getElementById('reportForm');
+    const formData = new FormData(form);
+    const actionUrl = form.getAttribute('action');
+    const saveBtn = form.querySelector('button[type="submit"]');
+    const saveExportBtn = document.getElementById('saveAndExportBtn');
+
+    // Deshabilitar botones
+    if (saveBtn) saveBtn.disabled = true;
+    saveExportBtn.disabled = true;
+    saveExportBtn.textContent = 'Procesando...';
+
+    try {
+        console.log('Iniciando guardado del reporte...');
+        // Paso 1: Guardar/Actualizar el reporte
+        const response = await fetch(actionUrl, {
+            method: form.getAttribute('method'),
+            body: formData,
+            headers: {
+                'X-CSRF-TOKEN': form.querySelector('input[name="_token"]').value,
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            credentials: 'same-origin'
+        });
+
+        console.log('Respuesta recibida:', response);
+        
+        // Verificar si la respuesta es JSON
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            const text = await response.text();
+            console.error('Respuesta no JSON:', text);
+            throw new Error('La respuesta del servidor no es JSON. Tipo de contenido: ' + contentType);
+        }
+
+        const data = await response.json();
+        console.log('Datos recibidos:', data);
+
+        if (data.success) {
+            console.log('Reporte guardado exitosamente');
+            // Paso 2: Si el guardado fue exitoso, iniciar la descarga del ZIP
+            if (data.report_id) {
+                console.log('Iniciando descarga del ZIP para el reporte:', data.report_id);
+                const exportUrl = '{{ route('reporte.export', ['report' => ':reportId']) }}'.replace(':reportId', data.report_id);
+                
+                // Crear un iframe oculto para la descarga
+                const iframe = document.createElement('iframe');
+                iframe.style.display = 'none';
+                document.body.appendChild(iframe);
+                
+                // Iniciar la descarga
+                iframe.src = exportUrl;
+                
+                // Remover el iframe después de un tiempo
+                setTimeout(() => {
+                    document.body.removeChild(iframe);
+                }, 5000);
+
+                // Redirigir al índice después de iniciar la descarga
+                setTimeout(() => {
+                    window.location.href = '{{ route('reporte.index') }}';
+                }, 200);
+
+            } else {
+                throw new Error('No se recibió el ID del reporte en la respuesta');
+            }
+        } else {
+            // Mostrar error si el guardado falló
+            let errorMessage = data.message || 'Error desconocido al guardar el reporte.';
+            if (data.errors) {
+                for (const field in data.errors) {
+                    errorMessage += '\n- ' + data.errors[field].join(', ');
+                }
+            }
+            throw new Error(errorMessage);
+        }
+    } catch (error) {
+        console.error('Error detallado:', error);
+        alert('Error: ' + error.message);
+    } finally {
+        // Re-habilitar botones
+        if (saveBtn) saveBtn.disabled = false;
+        saveExportBtn.disabled = false;
+        saveExportBtn.textContent = '{{ isset($isEdit) ? 'Actualizar y Exportar' : 'Guardar y Exportar' }}';
+    }
+});
 </script>
 @endif
 @endsection

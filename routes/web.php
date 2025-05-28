@@ -33,8 +33,10 @@ Route::middleware('auth')->group(function (){
     
     // Reporte
     Route::resource('reporte', ReportController::class);
+    Route::get('reporte/{report}/exportar', [ReportController::class, 'export'])->name('reporte.export');
 
     // Multimedia
+    Route::get('multimedia/exportar', [MultimediaController::class, 'export'])->name('multimedia.export');
     Route::resource('multimedia', MultimediaController::class);
 
     // Rutas de prueba para validación de archivos multimedia

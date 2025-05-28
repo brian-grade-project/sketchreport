@@ -141,8 +141,8 @@
          </table>
     </div>
  
-    <div class="mt-4">
-       {{ $reportes->links() }}
+    <div class="mt-4 bg-orange-600 p-4 rounded-lg">
+       {{ $reportes->links('pagination::tailwind') }}
     </div>
 </div>
 
@@ -164,7 +164,7 @@
     </div>
 </div>
 
-<script>
+  <script>
 let reportToDelete = null;
 
 function confirmDelete(id, title) {
@@ -197,160 +197,166 @@ document.getElementById('deleteConfirmDialog').addEventListener('click', functio
     }
 });
 
-// Función para mostrar/ocultar el dropdown
-const filterButton = document.querySelector('.relative button');
-const dropdownContent = document.getElementById('dropdown-content');
+    // Función para mostrar/ocultar el dropdown
+    const filterButton = document.querySelector('.relative button');
+    const dropdownContent = document.getElementById('dropdown-content');
 
-filterButton.addEventListener('click', function(e) {
-    e.stopPropagation();
-    dropdownContent.classList.toggle('opacity-0');
-    dropdownContent.classList.toggle('invisible');
-    dropdownContent.classList.toggle('scale-x-0');
-});
+    filterButton.addEventListener('click', function(e) {
+        e.stopPropagation();
+        dropdownContent.classList.toggle('opacity-0');
+        dropdownContent.classList.toggle('invisible');
+        dropdownContent.classList.toggle('scale-x-0');
+    });
 
-// Cerrar el dropdown al hacer clic fuera
-document.addEventListener('click', function(e) {
-    if (!e.target.closest('.relative')) {
+    // Cerrar el dropdown al hacer clic fuera
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.relative')) {
         dropdownContent.classList.add('opacity-0');
         dropdownContent.classList.add('invisible');
         dropdownContent.classList.add('scale-x-0');
-    }
-});
-
-// Función de búsqueda
-document.getElementById('search').addEventListener('keyup', function() {
-    const searchText = this.value.toLowerCase();
-    const rows = document.querySelectorAll('#report-list tr:not(.add-row)');
-    
-    rows.forEach(row => {
-        const text = row.textContent.toLowerCase();
-        row.style.display = text.includes(searchText) ? '' : 'none';
+        }
     });
-});
 
-// Función para obtener el tipo predominante de archivos
-function getPredominantFileType(mediaFiles) {
-    if (!mediaFiles || mediaFiles.length === 0) return 'none';
-    
-    const typeCount = {};
-    mediaFiles.forEach(file => {
-        const type = file.file_type.split('/')[0];
-        typeCount[type] = (typeCount[type] || 0) + 1;
-    });
-    
-    const sortedTypes = Object.entries(typeCount)
-        .sort((a, b) => b[1] - a[1]);
+    // Función de búsqueda
+    document.getElementById('search').addEventListener('keyup', function() {
+        const searchText = this.value.toLowerCase();
+        const rows = document.querySelectorAll('#report-list tr:not(.add-row)');
         
-    return sortedTypes.length > 0 ? sortedTypes[0][0] : 'none';
-}
-
-// Función de filtrado
-function filterTable(type) {
-    console.log('Filtrando por:', type); // Debug log
-    
-    const rows = Array.from(document.querySelectorAll('#report-list tr:not(.add-row)'));
-    const tbody = document.getElementById('report-list');
-    const buttons = document.querySelectorAll('.dropdown-content button');
-    
-    // Remover la clase activa de todos los botones
-    buttons.forEach(btn => {
-        btn.classList.remove('bg-orange-600', 'text-zinc-800');
-        btn.classList.add('bg-zinc-800', 'text-orange-600');
+        rows.forEach(row => {
+            const text = row.textContent.toLowerCase();
+            row.style.display = text.includes(searchText) ? '' : 'none';
+        });
     });
-    
-    // Agregar la clase activa al botón seleccionado
-    const activeButton = document.querySelector(`.dropdown-content button[onclick="filterTable('${type}')"]`);
-    if (activeButton) {
-        activeButton.classList.remove('bg-zinc-800', 'text-orange-600');
-        activeButton.classList.add('bg-orange-600', 'text-zinc-800');
+
+    // Función para obtener el tipo predominante de archivos
+    function getPredominantFileType(mediaFiles) {
+        if (!mediaFiles || mediaFiles.length === 0) return 'none';
+        
+        const typeCount = {};
+        mediaFiles.forEach(file => {
+            const type = file.file_type.split('/')[0];
+            typeCount[type] = (typeCount[type] || 0) + 1;
+        });
+        
+        const sortedTypes = Object.entries(typeCount)
+            .sort((a, b) => b[1] - a[1]);
+            
+        return sortedTypes.length > 0 ? sortedTypes[0][0] : 'none';
     }
 
-    // Cerrar el dropdown después de seleccionar
+    // Función de filtrado
+    function filterTable(type) {
+        console.log('Filtrando por:', type); // Debug log
+        
+        const rows = Array.from(document.querySelectorAll('#report-list tr:not(.add-row)'));
+        const tbody = document.getElementById('report-list');
+        const buttons = document.querySelectorAll('.dropdown-content button');
+        
+        // Remover la clase activa de todos los botones
+        buttons.forEach(btn => {
+            btn.classList.remove('bg-orange-600', 'text-zinc-800');
+            btn.classList.add('bg-zinc-800', 'text-orange-600');
+        });
+        
+        // Agregar la clase activa al botón seleccionado
+        const activeButton = document.querySelector(`.dropdown-content button[onclick="filterTable('${type}')"]`);
+        if (activeButton) {
+            activeButton.classList.remove('bg-zinc-800', 'text-orange-600');
+            activeButton.classList.add('bg-orange-600', 'text-zinc-800');
+        }
+
+        // Cerrar el dropdown después de seleccionar
     dropdownContent.classList.add('opacity-0');
     dropdownContent.classList.add('invisible');
     dropdownContent.classList.add('scale-x-0');
-    
-    // Ordenar las filas
-    const sortedRows = rows.sort((a, b) => {
-        let aValue, bValue;
         
-        switch(type) {
-            case 'name':
-                aValue = a.querySelector('td:first-child').textContent.trim().toLowerCase();
-                bValue = b.querySelector('td:first-child').textContent.trim().toLowerCase();
-                console.log('Comparando nombres:', aValue, bValue);
-                return aValue.localeCompare(bValue);
-                
-            case 'date':
-                aValue = new Date(a.querySelector('td:nth-child(2)').textContent.trim());
-                bValue = new Date(b.querySelector('td:nth-child(2)').textContent.trim());
-                console.log('Comparando fechas:', aValue, bValue);
-                return bValue - aValue; // Más reciente primero
-                
-            case 'type':
-                const aMediaFiles = JSON.parse(a.dataset.mediaFiles || '[]');
-                const bMediaFiles = JSON.parse(b.dataset.mediaFiles || '[]');
-                aValue = getPredominantFileType(aMediaFiles);
-                bValue = getPredominantFileType(bMediaFiles);
-                console.log('Comparando tipos:', aValue, bValue);
-                return aValue.localeCompare(bValue);
-                
-            default:
-                return 0;
-        }
-    });
-    
-    // Limpiar y reconstruir la tabla
-    const addRow = document.querySelector('.add-row');
-    tbody.innerHTML = '';
-    if (addRow) tbody.appendChild(addRow);
-    sortedRows.forEach(row => tbody.appendChild(row));
-}
+        // Ordenar las filas
+        const sortedRows = rows.sort((a, b) => {
+            let aValue, bValue;
+            
+            switch(type) {
+                case 'name':
+                    aValue = a.querySelector('td:first-child').textContent.trim().toLowerCase();
+                    bValue = b.querySelector('td:first-child').textContent.trim().toLowerCase();
+                    console.log('Comparando nombres:', aValue, bValue);
+                    return aValue.localeCompare(bValue);
+                    
+                case 'date':
+                    aValue = new Date(a.querySelector('td:nth-child(2)').textContent.trim());
+                    bValue = new Date(b.querySelector('td:nth-child(2)').textContent.trim());
+                    console.log('Comparando fechas:', aValue, bValue);
+                    return bValue - aValue; // Más reciente primero
+                    
+                case 'type':
+                    const aMediaFiles = JSON.parse(a.dataset.mediaFiles || '[]');
+                    const bMediaFiles = JSON.parse(b.dataset.mediaFiles || '[]');
+                    aValue = getPredominantFileType(aMediaFiles);
+                    bValue = getPredominantFileType(bMediaFiles);
+                    console.log('Comparando tipos:', aValue, bValue);
+                    return aValue.localeCompare(bValue);
+                    
+                default:
+                    return 0;
+            }
+        });
+        
+        // Limpiar y reconstruir la tabla
+        const addRow = document.querySelector('.add-row');
+        tbody.innerHTML = '';
+        if (addRow) tbody.appendChild(addRow);
+        sortedRows.forEach(row => tbody.appendChild(row));
+    }
 
-function resetTable() {
-    console.log('Reseteando tabla'); // Debug log
-    
-    const rows = Array.from(document.querySelectorAll('#report-list tr:not(.add-row)'));
-    const tbody = document.getElementById('report-list');
-    const buttons = document.querySelectorAll('.dropdown-content button');
-    
-    // Remover la clase activa de todos los botones
-    buttons.forEach(btn => {
-        btn.classList.remove('bg-orange-600', 'text-zinc-800');
-        btn.classList.add('bg-zinc-800', 'text-orange-600');
-    });
+    function resetTable() {
+        console.log('Reseteando tabla'); // Debug log
+        
+        const rows = Array.from(document.querySelectorAll('#report-list tr:not(.add-row)'));
+        const tbody = document.getElementById('report-list');
+        const buttons = document.querySelectorAll('.dropdown-content button');
+        
+        // Remover la clase activa de todos los botones
+        buttons.forEach(btn => {
+            btn.classList.remove('bg-orange-600', 'text-zinc-800');
+            btn.classList.add('bg-zinc-800', 'text-orange-600');
+        });
 
-    // Cerrar el dropdown
+        // Cerrar el dropdown
     dropdownContent.classList.add('opacity-0');
     dropdownContent.classList.add('invisible');
     dropdownContent.classList.add('scale-x-0');
-    
-    // Ordenar por ID
-    const sortedRows = rows.sort((a, b) => {
-        const aId = parseInt(a.dataset.id);
-        const bId = parseInt(b.dataset.id);
-        console.log('Comparando IDs:', aId, bId);
-        return aId - bId;
-    });
-    
-    // Limpiar y reconstruir la tabla
-    const addRow = document.querySelector('.add-row');
-    tbody.innerHTML = '';
-    if (addRow) tbody.appendChild(addRow);
-    sortedRows.forEach(row => tbody.appendChild(row));
-}
+        
+        // Ordenar por ID
+        const sortedRows = rows.sort((a, b) => {
+            const aId = parseInt(a.dataset.id);
+            const bId = parseInt(b.dataset.id);
+            console.log('Comparando IDs:', aId, bId);
+            return aId - bId;
+        });
+        
+        // Limpiar y reconstruir la tabla
+        const addRow = document.querySelector('.add-row');
+        tbody.innerHTML = '';
+        if (addRow) tbody.appendChild(addRow);
+        sortedRows.forEach(row => tbody.appendChild(row));
+    }
 
-// Inicializar los tipos predominantes de archivos
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM cargado'); // Debug log
-    
-    const rows = document.querySelectorAll('#report-list tr:not(.add-row)');
-    rows.forEach(row => {
-        const mediaFiles = JSON.parse(row.dataset.mediaFiles || '[]');
-        if (mediaFiles.length > 0) {
-            row.dataset.predominantType = getPredominantFileType(mediaFiles);
-        }
+    // Inicializar los tipos predominantes de archivos
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('DOM cargado'); // Debug log
+        
+        const rows = document.querySelectorAll('#report-list tr:not(.add-row)');
+        rows.forEach(row => {
+            const mediaFiles = JSON.parse(row.dataset.mediaFiles || '[]');
+            if (mediaFiles.length > 0) {
+                row.dataset.predominantType = getPredominantFileType(mediaFiles);
+            }
+        });
     });
-});
-</script>
+  </script>
+
+@if(session('success'))
+<div id="successMessage" class="fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg">
+    {{ session('success') }}
+</div>
+@endif
 @endsection
