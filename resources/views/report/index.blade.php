@@ -66,7 +66,7 @@
             @foreach($reportes as $reporte)
             <tr data-id="{{ $reporte->id }}" data-media-files="{{ json_encode($reporte->media_files) }}" class="hover:bg-zinc-600 transition-colors duration-200">
                 <td class="p-2">{{ $reporte->title }}</td>
-                <td class="p-2">{{ $reporte->report_date }}</td>
+                <td class="p-2">{{ $reporte->report_date->format('Y-m-d') }}</td>
                 <td class="p-2">
                     @if($reporte->media_files->count() > 0)
                         <span class="text-sm">{{ $reporte->media_files->count() }} archivos</span>

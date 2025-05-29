@@ -121,7 +121,7 @@
             @foreach($multimedias as $multimedia)
             <tr data-id="{{ $multimedia->id }}" class="hover:bg-zinc-600 transition-colors duration-200">
                 <td class="p-2">{{ $multimedia->text }}</td>
-                <td class="p-2">{{ $multimedia->media_date }}</td>
+                <td class="p-2">{{ $multimedia->media_date->format('Y-m-d') }}</td>
                 <td class="p-2">
                     <span class="text-sm">{{ ucfirst($multimedia->type) }}</span>
                 </td>

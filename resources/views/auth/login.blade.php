@@ -46,13 +46,15 @@
                 </button>
             </form>
 
-            <div class="w-screen h-6 bg-orange-600 mt-10 mb-5"></div>
+            <div class="w-screen h-6 bg-orange-600 mt-6 mb-3"></div>
 
-            <a href="{{ route('register') }}" class="text-orange-600 underline font-light m-auto ml-24 md:ml-[11%] lg:ml-[21%] xl:ml-[28%] md:text-sm mt-12 block">¿Aún no tienes una cuenta? <b>¡Registrate!</b></a>
+            <div class="text-center">
+                <a href="{{ route('register') }}" class="text-orange-600 underline font-light md:text-sm mt-2 inline-block">¿Aún no tienes una cuenta? <b>¡Registrate!</b></a>
 
-            <a href="{{ route('register') }}" class="text-orange-600 text-center font-bold text-xl md:text-lg bg-zinc-800 border-4 md:border-2 border-orange-600 rounded-full block m-auto ml-26 lg:ml-27 xl:ml-[27%] mt-5 p-1 px-2 xl:px-4 italic hover:bg-orange-600 hover:text-zinc-800 hover:transition-all duration-500 ease-in-out">
-                Crea una cuenta gratuita
-            </a>
+                <a href="{{ route('register') }}" class="text-orange-600 text-center font-bold text-xl md:text-lg bg-zinc-800 border-4 md:border-2 border-orange-600 rounded-full block m-auto mt-3 p-1 px-2 xl:px-4 italic hover:bg-orange-600 hover:text-zinc-800 hover:transition-all duration-500 ease-in-out w-7/12">
+                    Crea una cuenta gratuita
+                </a>
+            </div>
         </div>
     </div>
 @endsection
