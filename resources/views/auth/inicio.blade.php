@@ -34,7 +34,7 @@
                             <tr class="group">
                                 <td class="text-orange-600 p-2 bg-zinc-700 group-hover:bg-zinc-600 transition-colors duration-200">{{ $reporte->title }}</td>
                                 <td class="text-orange-600 p-2 bg-zinc-700 group-hover:bg-zinc-600 transition-colors duration-200">{{ $reporte->text }}</td>
-                                <td class="text-orange-600 p-2 bg-zinc-700 group-hover:bg-zinc-600 transition-colors duration-200">{{ $reporte->multimedias->count() }}</td>
+                                <td class="text-orange-600 p-2 bg-zinc-700 group-hover:bg-zinc-600 transition-colors duration-200">{{ $reporte->media_files->count() }}</td>
                                 <td class="text-orange-600 p-2 bg-zinc-700 group-hover:bg-zinc-600 transition-colors duration-200">{{ $reporte->updated_at }}</td>
                     </tr>
                   @endforeach

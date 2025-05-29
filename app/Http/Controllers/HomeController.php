@@ -12,7 +12,7 @@ class HomeController extends Controller
     //
     public function inicio(): View
     {
-        $reportes = Report::latest()->take(7)->get();
+        $reportes = Report::with('media_files')->latest()->take(7)->get();
         $multimedias = Multimedia::latest()->take(7)->get();
 
         // dd($reportes);
