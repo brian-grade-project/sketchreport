@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\MultimediaController;
+use App\Http\Controllers\Auth\RegisterController;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,7 +25,8 @@ Route::get('/', function () {
 Route::get('ingresar', [LoginController::class, 'login'])->name('login');
 Route::post('login', [LoginController::class, 'check'])->name('login.check');
 
-Route::view('register', 'auth.register')->name('register');
+Route::get('/register', [RegisterController::class, 'create'])->name('register');
+Route::post('/register', [RegisterController::class, 'store'])->name('register.store');
 
 // Zona para autenticados
 Route::middleware('auth')->group(function (){
