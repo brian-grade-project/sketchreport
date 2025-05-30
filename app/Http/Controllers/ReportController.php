@@ -10,9 +10,18 @@ class ReportController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $reportes = Report::with('media_files')->paginate(15);
+        $query = Report::with('media_files');
+
+        if ($request->has('search')) {
+            $searchTerm = $request->search;
+            $query->where('title', 'like', '%' . $searchTerm . '%')
+                  ->orWhere('text', 'like', '%' . $searchTerm . '%');
+        }
+
+        $reportes = $query->paginate(15);
+
         return view('report.index', compact('reportes'));
     }
 

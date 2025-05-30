@@ -118,7 +118,7 @@
             </form>
 
             <div class="w-screen h-6 bg-orange-600 mt-6 mb-3"></div>
-
+            
             <div class="text-center">
                 <a href="{{ route('login') }}" class="text-orange-600 underline font-light md:text-sm mt-2 inline-block">
                     ¿Ya tienes una cuenta? <b>¡Inicia sesión!</b>

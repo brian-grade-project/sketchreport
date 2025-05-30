@@ -17,9 +17,17 @@ class MultimediaController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $multimedias = Multimedia::latest()->paginate(10);
+        $query = Multimedia::latest();
+
+        if ($request->has('search')) {
+            $searchTerm = $request->search;
+            $query->where('text', 'like', '%' . $searchTerm . '%');
+        }
+
+        $multimedias = $query->paginate(10);
+
         return view('multimedia.index', compact('multimedias'));
     }
 

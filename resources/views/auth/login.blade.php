@@ -52,8 +52,8 @@
                 <a href="{{ route('register') }}" class="text-orange-600 underline font-light md:text-sm mt-2 inline-block">¿Aún no tienes una cuenta? <b>¡Registrate!</b></a>
 
                 <a href="{{ route('register') }}" class="text-orange-600 text-center font-bold text-xl md:text-lg bg-zinc-800 border-4 md:border-2 border-orange-600 rounded-full block m-auto mt-3 p-1 px-2 xl:px-4 italic hover:bg-orange-600 hover:text-zinc-800 hover:transition-all duration-500 ease-in-out w-7/12">
-                    Crea una cuenta gratuita
-                </a>
+                Crea una cuenta gratuita
+            </a>
             </div>
         </div>
     </div>

@@ -6,6 +6,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\MultimediaController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\SearchController;
 
 /*
 |--------------------------------------------------------------------------
@@ -47,6 +48,9 @@ Route::middleware('auth')->group(function (){
     })->name('multimedia.test-view');
     
     Route::post('/test-upload', [MultimediaController::class, 'testUpload'])->name('multimedia.test-upload');
+
+    // Busqueda
+    Route::get('search', [SearchController::class, 'performSearch'])->name('search.perform');
 
     // Cerrar sesión
     Route::get('salir', [LoginController::class, 'logout'])->name('logout');
