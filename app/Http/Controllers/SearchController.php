@@ -36,7 +36,8 @@ class SearchController extends Controller
                 return response()->json([
                     'message' => 'La búsqueda encontró similitud en consultas.',
                     'type' => 'ambiguous',
-                    'redirect' => route('reporte.index', ['search' => $searchTerm])
+                    'report_redirect' => route('reporte.index', ['search' => $searchTerm]),
+                    'multimedia_redirect' => route('multimedia.index', ['search' => $searchTerm]),
                 ]);
             } elseif ($reportCount > 0) {
                 // Coincidencia solo en reportes

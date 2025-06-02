@@ -61,17 +61,18 @@
                 messageContainer.innerHTML = '';
 
                 if (data.redirect) {
-                    // Si hay una redirección, mostrar el mensaje y luego redirigir
+                    // Si hay una redirección directa (reporte único o multimedia único)
                     showMessage(data.message, 'success');
                     setTimeout(() => {
                         window.location.href = data.redirect;
                     }, 1000);
+                } else if (data.type === 'ambiguous') {
+                    // Si es ambiguo, mostrar opciones
+                    showAmbiguousMessage(data.message, data.report_redirect, data.multimedia_redirect);
                 } else {
-                    // Si no hay redirección, mostrar el mensaje según el tipo
+                    // Si no hay redirección y no es ambiguo (no encontrado)
                     let messageType = 'info';
-                    if (data.type === 'ambiguous') {
-                        messageType = 'warning';
-                    } else if (data.type === 'not_found') {
+                    if (data.type === 'not_found') {
                         messageType = 'error';
                     }
                     showMessage(data.message, messageType);
@@ -127,5 +128,32 @@
         setTimeout(() => {
             messageElement.remove();
         }, 3000);
+    }
+
+    function showAmbiguousMessage(message, reportUrl, multimediaUrl) {
+        const messageContainer = document.getElementById('message-container');
+
+        // Create message element
+        const messageElement = document.createElement('div');
+        messageElement.classList.add('alert', 'shadow-lg', 'w-auto', 'pointer-events-auto', 'flex-col', 'lg:flex-row');
+
+        // Add warning icon
+        const icon = '<svg xmlns="http://www.w3.org/2000/svg" class="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>';
+
+        // Add message text and buttons
+        messageElement.innerHTML = `
+            <div>
+                ${icon}
+                <span>${message}</span>
+            </div>
+            <div class="flex flex-col lg:flex-row mt-2 lg:mt-0">
+                <button class="btn btn-sm btn-primary mr-2 mb-1 lg:mb-0" onclick="window.location.href='${reportUrl}'">Ver Reportes</button>
+                <button class="btn btn-sm btn-secondary" onclick="window.location.href='${multimediaUrl}'">Ver Multimedia</button>
+            </div>
+        `;
+
+        messageContainer.appendChild(messageElement);
+
+        // Do not automatically remove ambiguous message
     }
 </script>
