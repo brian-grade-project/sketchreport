@@ -52,6 +52,11 @@ Route::middleware('auth')->group(function (){
     // Busqueda
     Route::get('search', [SearchController::class, 'performSearch'])->name('search.perform');
 
+    // Perfil
+    Route::get('profile', function () {
+        return view('profile.profile');
+    })->name('profile');
+
     // Cerrar sesión
     Route::get('salir', [LoginController::class, 'logout'])->name('logout');
 });
