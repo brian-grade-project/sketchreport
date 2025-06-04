@@ -72,14 +72,14 @@
                                    </svg>
                                </button>
                            </div>
-                        </div>
+                    </div>
 
                         <div class="p-2 pl-2 mt-5 bg-zinc-800 rounded-full flex items-center justify-between">
                            <label for="email" class="text-xl font-light text-orange-600">Correo: </label>
                            <div class="flex items-center w-[70%]">
                                <input type="email" id="email" name="email" value="{{ auth()->user()->email }}" class="w-full p-1 pl-3 bg-orange-600 rounded-full" readonly>
                            </div>
-                        </div>
+                    </div>
 
                         <div class="p-2 pl-2 mt-5 bg-zinc-800 rounded-full flex items-center justify-between">
                            <label for="telefono" class="text-xl md:text-lg font-light text-orange-600">Teléfono: </label>
@@ -91,7 +91,7 @@
                                    </svg>
                                </button>
                            </div>
-                        </div>
+                    </div>
                     </form>
                 </div>
 

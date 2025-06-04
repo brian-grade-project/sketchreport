@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Report;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class ReportController extends Controller
 {
@@ -12,12 +13,14 @@ class ReportController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Report::with('media_files');
+        $query = Report::where('user_id', auth()->id())->with('media_files');
 
         if ($request->has('search')) {
             $searchTerm = $request->search;
-            $query->where('title', 'like', '%' . $searchTerm . '%')
+            $query->where(function($q) use ($searchTerm) {
+                $q->where('title', 'like', '%' . $searchTerm . '%')
                   ->orWhere('text', 'like', '%' . $searchTerm . '%');
+            });
         }
 
         $reportes = $query->paginate(15);
@@ -36,6 +39,12 @@ class ReportController extends Controller
             try {
                 \Log::info('Intentando cargar reporte para ver', ['id' => $request->view]);
                 $reporte = Report::with('media_files')->findOrFail($request->view);
+                
+                // Verificar que el reporte pertenece al usuario
+                if ($reporte->user_id !== auth()->id()) {
+                    return redirect()->route('reporte.index')
+                        ->with('error', 'No tienes permiso para ver este reporte.');
+                }
                 
                 \Log::info('Reporte encontrado', [
                     'id' => $reporte->id,
@@ -98,6 +107,7 @@ class ReportController extends Controller
                 return response()->json([
                     'success' => true,
                     'message' => 'Reporte creado exitosamente',
+                    'report_id' => $report->id,
                     'redirect' => route('reporte.index')
                 ]);
             }
@@ -105,6 +115,8 @@ class ReportController extends Controller
             return redirect()->route('reporte.index')
                 ->with('success', 'Reporte creado exitosamente');
         } catch (\Exception $e) {
+            \Log::error('Error al crear el reporte: ' . $e->getMessage());
+            
             if ($request->wantsJson()) {
                 return response()->json([
                     'success' => false,
@@ -126,6 +138,12 @@ class ReportController extends Controller
         \Log::info('Método show llamado', ['report_id' => $report->id]);
         
         try {
+            // Verificar que el reporte pertenece al usuario
+            if ($report->user_id !== auth()->id()) {
+                return redirect()->route('reporte.index')
+                    ->with('error', 'No tienes permiso para ver este reporte.');
+            }
+
             // Cargar el reporte con sus archivos multimedia
             $reporte = Report::with('media_files')->findOrFail($report->id);
             \Log::info('Reporte encontrado', ['reporte_id' => $reporte->id]);
@@ -168,6 +186,12 @@ class ReportController extends Controller
             // Cargar el reporte con sus archivos multimedia
             $reporte = Report::with('media_files')->findOrFail($id);
             
+            // Verificar que el reporte pertenece al usuario
+            if ($reporte->user_id !== auth()->id()) {
+                return redirect()->route('reporte.index')
+                    ->with('error', 'No tienes permiso para editar este reporte.');
+            }
+            
             \Log::info('Reporte encontrado', [
                 'reporte_id' => $reporte->id,
                 'title' => $reporte->title,
@@ -200,56 +224,50 @@ class ReportController extends Controller
         ]);
 
         try {
-            // Buscar el reporte específico
-            $report = Report::findOrFail($id);
-            
-            \Log::info('Reporte encontrado para actualizar', [
-                'id' => $report->id,
-                'current_title' => $report->title,
-                'current_text' => $report->text,
-                'current_date' => $report->report_date
-            ]);
+            $reporte = Report::findOrFail($id);
+
+            // Verificar que el reporte pertenece al usuario
+            if ($reporte->user_id !== auth()->id()) {
+                return redirect()->route('reporte.index')
+                    ->with('error', 'No tienes permiso para actualizar este reporte.');
+            }
 
             $request->validate([
                 'title' => 'required|string|max:255',
                 'content' => 'required|string',
                 'report_date' => 'required|date',
-                'media.*' => 'nullable|file|max:10240' // 10MB máximo por archivo
+                'media.*' => 'nullable|file|max:10240', // 10MB máximo por archivo
+                'delete_media' => 'nullable|array',
+                'delete_media.*' => 'exists:media_files,id'
             ]);
 
-            // Actualizar los datos básicos del reporte
-            $report->title = $request->input('title');
-            $report->text = $request->input('content');
-            $report->report_date = $request->input('report_date');
-            
-            \Log::info('Datos a actualizar', [
-                'title' => $report->title,
-                'text' => $report->text,
-                'report_date' => $report->report_date
-            ]);
+            $reporte->title = $request->title;
+            $reporte->text = $request->content;
+            $reporte->report_date = $request->report_date;
+            $reporte->save();
 
-            $saved = $report->save();
-
-            \Log::info('Resultado de la actualización', [
-                'saved' => $saved,
-                'updated_report' => $report->fresh()->toArray()
-            ]);
+            // Eliminar archivos multimedia seleccionados
+            if ($request->has('delete_media')) {
+                foreach ($request->delete_media as $mediaId) {
+                    $media = $reporte->media_files()->find($mediaId);
+                    if ($media) {
+                        if (Storage::exists('public/' . $media->file_path)) {
+                            Storage::delete('public/' . $media->file_path);
+                        }
+                        $media->delete();
+                    }
+                }
+            }
 
             // Procesar nuevos archivos si existen
             if ($request->hasFile('media')) {
                 foreach ($request->file('media') as $file) {
-                    $path = $file->store('public/reports/' . $report->id);
-                    $mediaFile = $report->media_files()->create([
+                    $path = $file->store('public/reports/' . $reporte->id);
+                    $reporte->media_files()->create([
                         'file_path' => str_replace('public/', '', $path),
                         'file_name' => $file->getClientOriginalName(),
                         'file_type' => $file->getMimeType(),
                         'file_size' => $file->getSize()
-                    ]);
-
-                    \Log::info('Archivo multimedia agregado', [
-                        'file_name' => $file->getClientOriginalName(),
-                        'file_type' => $file->getMimeType(),
-                        'media_file_id' => $mediaFile->id
                     ]);
                 }
             }
@@ -258,6 +276,7 @@ class ReportController extends Controller
                 return response()->json([
                     'success' => true,
                     'message' => 'Reporte actualizado exitosamente',
+                    'report_id' => $reporte->id,
                     'redirect' => route('reporte.index')
                 ]);
             }
@@ -265,12 +284,8 @@ class ReportController extends Controller
             return redirect()->route('reporte.index')
                 ->with('success', 'Reporte actualizado exitosamente');
         } catch (\Exception $e) {
-            \Log::error('Error al actualizar el reporte: ' . $e->getMessage(), [
-                'trace' => $e->getTraceAsString(),
-                'request_data' => $request->all(),
-                'id' => $id
-            ]);
-
+            \Log::error('Error en update method: ' . $e->getMessage());
+            
             if ($request->wantsJson()) {
                 return response()->json([
                     'success' => false,
@@ -290,36 +305,84 @@ class ReportController extends Controller
     public function destroy($id)
     {
         try {
-            \Log::info('Método destroy llamado', ['id' => $id]);
-            
-            $report = Report::findOrFail($id);
-            
+            $reporte = Report::findOrFail($id);
+
+            // Verificar que el reporte pertenece al usuario
+            if ($reporte->user_id !== auth()->id()) {
+                return redirect()->route('reporte.index')
+                    ->with('error', 'No tienes permiso para eliminar este reporte.');
+            }
+
             // Eliminar archivos multimedia asociados
-            foreach ($report->media_files as $media) {
-                // Eliminar archivo físico
-                $filePath = storage_path('app/public/' . $media->file_path);
-                if (file_exists($filePath)) {
-                    unlink($filePath);
+            foreach ($reporte->media_files as $media) {
+                if (Storage::exists('public/' . $media->file_path)) {
+                    Storage::delete('public/' . $media->file_path);
                 }
-                // Eliminar registro de la base de datos
                 $media->delete();
             }
-            
+
             // Eliminar el reporte
-            $report->delete();
-            
-            \Log::info('Reporte eliminado exitosamente', ['id' => $id]);
-            
+            $reporte->delete();
+
             return redirect()->route('reporte.index')
                 ->with('success', 'Reporte eliminado exitosamente');
         } catch (\Exception $e) {
-            \Log::error('Error al eliminar el reporte: ' . $e->getMessage(), [
-                'id' => $id,
-                'trace' => $e->getTraceAsString()
-            ]);
-            
+            \Log::error('Error en destroy method: ' . $e->getMessage());
             return redirect()->route('reporte.index')
                 ->with('error', 'Error al eliminar el reporte: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Export the report and its media files as a ZIP file.
+     */
+    public function export($id)
+    {
+        try {
+            $report = Report::with('media_files')->findOrFail($id);
+
+            // Verificar que el reporte pertenece al usuario
+            if ($report->user_id !== auth()->id()) {
+                return redirect()->route('reporte.index')
+                    ->with('error', 'No tienes permiso para exportar este reporte.');
+            }
+
+            // Crear un archivo ZIP temporal
+            $zip = new \ZipArchive();
+            $zipFileName = 'reporte_' . $report->id . '_' . time() . '.zip';
+            $zipPath = storage_path('app/public/temp/' . $zipFileName);
+
+            // Asegurarse de que el directorio temporal existe
+            if (!file_exists(storage_path('app/public/temp'))) {
+                mkdir(storage_path('app/public/temp'), 0755, true);
+            }
+
+            if ($zip->open($zipPath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) === TRUE) {
+                // Agregar el contenido del reporte como un archivo de texto
+                $reportContent = "Título: " . $report->title . "\n";
+                $reportContent .= "Fecha: " . $report->report_date . "\n\n";
+                $reportContent .= "Contenido:\n" . $report->text;
+                $zip->addFromString('reporte.txt', $reportContent);
+
+                // Agregar los archivos multimedia
+                foreach ($report->media_files as $media) {
+                    $filePath = storage_path('app/public/' . $media->file_path);
+                    if (file_exists($filePath)) {
+                        $zip->addFile($filePath, 'media/' . basename($media->file_path));
+                    }
+                }
+
+                $zip->close();
+
+                // Descargar el archivo ZIP
+                return response()->download($zipPath)->deleteFileAfterSend(true);
+            } else {
+                throw new \Exception('No se pudo crear el archivo ZIP');
+            }
+        } catch (\Exception $e) {
+            \Log::error('Error al exportar el reporte: ' . $e->getMessage());
+            return redirect()->route('reporte.index')
+                ->with('error', 'Error al exportar el reporte: ' . $e->getMessage());
         }
     }
 }

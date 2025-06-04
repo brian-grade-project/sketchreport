@@ -40,7 +40,7 @@
 
             <img class=" float-left lg:w-8/12 md:w-[60%] h-screen lg:ml-0 md:ml-[29%]" src="/img/img1.png">
             
-            <a class="text-orange-600 text-center leading-none lg:text-3xl md:text-2xl absolute top-2/3  left-48 hover:transition-all duration-500 ease-in-out hover:text-zinc-800 hover:bg-orange-600 pointer rounded-full px-10 py-14 mb-5 " href="#">Inicia<br> <b>AHORA<b></a>
+            <a class="text-orange-600 text-center leading-none lg:text-3xl md:text-2xl absolute top-2/3  left-48 hover:transition-all duration-500 ease-in-out hover:text-zinc-800 hover:bg-orange-600 pointer rounded-full px-10 py-14 mb-5 " href="{{ route('login') }}">Inicia<br> <b>AHORA<b></a>
         </nav>
 
 
@@ -75,17 +75,17 @@
                Nuestra aplicación está diseñada para asegurar tu comodidad y acceso en todo momento
             </p>
 
-            <p class="lg:text-2xl md:text-lg text-white text-left  lg:max-w-xl md:w-[50%] leading-none font-light absolute top-28 left-7 ">
-               Puedes acceder a ella tanto desde tu computadora como desde tus dispositivos móviles, para que puedas trabajar desde donde quieras y cuando quieras.<br><br>
+            <p class="lg:text-xl md:text-base text-white text-left lg:max-w-xl md:w-[50%] leading-relaxed font-light absolute top-36 left-7">
+               Puedes acceder a ella tanto desde tu computadora como desde tus dispositivos móviles, para que puedas trabajar desde donde quieras y cuando quieras.<br>
                
-               <spam>Además, lleva contigo tu propio registro y almacenamiento de reportes, fotos, videos, audios e incluso documentos. Todo en un solo lugar, para que tengas toda la información que necesitas al alcance de tu mano.</spam><br><br>
+               <span class="block mt-2">Además, lleva contigo tu propio registro y almacenamiento de reportes, fotos, videos, audios e incluso documentos. Todo en un solo lugar, para que tengas toda la información que necesitas al alcance de tu mano.</span>
 
-               <spam>No importa si eres un profesional independiente, un estudiante o un emprendedor, nuestra plataforma te ayudará a organizar tus tareas, proyectos y documentos de una manera eficiente y práctica</spam>
+               <span class="block mt-2">No importa si eres un profesional independiente, un estudiante o un emprendedor, nuestra plataforma te ayudará a organizar tus tareas, proyectos y documentos de una manera eficiente y práctica</span>
             </p>
 
             <img class="float-right w-7/12 h-screen" src="/img/img3.png">
 
-            <a class="text-orange-600 text-center leading-none lg:text-3xl md:text-2xl absolute lg:top-3/4 md:top-[73%] xl:top-[73%] lg:left-52 md:left-[16%] hover:transition-all duration-500 ease-in-out hover:text-zinc-800 hover:bg-orange-600 pointer rounded-full px-5 py-10 mb-5 " href="#">Inicia<br> <b>AHORA<b></a>
+            <a class="text-orange-600 text-center leading-none lg:text-3xl md:text-2xl absolute lg:top-3/4 md:top-[73%] xl:top-[73%] lg:left-52 md:left-[16%] hover:transition-all duration-500 ease-in-out hover:text-zinc-800 hover:bg-orange-600 pointer rounded-full px-5 py-10 mb-5 " href="{{ route('login') }}">Inicia<br> <b>AHORA<b></a>
 
 
 

@@ -28,10 +28,10 @@ Route::get('/', function () {
 
 // Rutas para invitados (no autenticados)
 Route::middleware(['web', 'guest'])->group(function () {
-    Route::get('ingresar', [LoginController::class, 'login'])->name('login');
-    Route::post('login', [LoginController::class, 'check'])->name('login.check');
-    Route::get('/register', [RegisterController::class, 'create'])->name('register');
-    Route::post('/register', [RegisterController::class, 'store'])->name('register.store');
+Route::get('ingresar', [LoginController::class, 'login'])->name('login');
+Route::post('login', [LoginController::class, 'check'])->name('login.check');
+Route::get('/register', [RegisterController::class, 'create'])->name('register');
+Route::post('/register', [RegisterController::class, 'store'])->name('register.store');
 });
 
 // Zona para autenticados

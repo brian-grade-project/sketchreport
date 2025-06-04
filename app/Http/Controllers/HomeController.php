@@ -12,8 +12,21 @@ class HomeController extends Controller
     //
     public function inicio(): View
     {
-        $reportes = Report::with('media_files')->latest()->take(7)->get();
-        $multimedias = Multimedia::latest()->take(7)->get();
+        // Obtener el usuario actual
+        $user = auth()->user();
+
+        // Obtener los últimos 7 reportes del usuario actual
+        $reportes = Report::with('media_files')
+            ->where('user_id', $user->id)
+            ->latest()
+            ->take(7)
+            ->get();
+
+        // Obtener los últimos 7 archivos multimedia del usuario actual
+        $multimedias = Multimedia::where('user_id', $user->id)
+            ->latest()
+            ->take(7)
+            ->get();
 
         // dd($reportes);
         return view('auth.inicio', compact('reportes', 'multimedias'));

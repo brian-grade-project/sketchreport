@@ -58,6 +58,15 @@
                     @if(isset($reporte) && $reporte->media_files)
                         @foreach($reporte->media_files as $media)
                             <div class="relative bg-zinc-700 rounded-lg p-2 group">
+                                @if(!isset($isReadOnly) || !$isReadOnly)
+                                <button type="button" 
+                                        class="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-red-600 z-10"
+                                        onclick="markForDeletion({{ $media->id }}, this)">
+                                    ×
+                                </button>
+                                <input type="hidden" name="delete_media[]" value="{{ $media->id }}" class="delete-media-input" disabled>
+                                @endif
+
                                 @if(str_starts_with($media->file_type, 'image/'))
                                     <img src="{{ asset('storage/' . $media->file_path) }}" 
                                          alt="Preview" 
@@ -261,21 +270,15 @@ function handleFiles(e) {
         return;
     }
 
-    const previewSection = document.getElementById('previewSection');
     const previewContainer = document.getElementById('previewContainer');
-
-    // Remove all dynamically added previews, keep existing media and the add button placeholder
-    // Note: The add button is removed and re-added later, so we just clear the content here.
-    while (previewContainer.lastChild) {
-        previewContainer.removeChild(previewContainer.lastChild);
-    }
     
-    // Remover el botón de agregar si existe
-    const addButton = previewContainer.querySelector('.relative.bg-zinc-700.rounded-lg.p-2');
+    // Remover solo el botón de agregar si existe
+    const addButton = previewContainer.querySelector('.relative.bg-zinc-700.rounded-lg.p-2:last-child');
     if (addButton) {
         addButton.remove();
     }
     
+    // Agregar las nuevas vistas previas
     files.forEach(file => {
         const preview = createPreview(file);
         if (preview) {
@@ -342,30 +345,33 @@ document.getElementById('saveAndExportBtn').addEventListener('click', async func
 
         if (data.success) {
             console.log('Reporte guardado exitosamente');
+            showNotification(data.message, 'success');
+            
             // Paso 2: Si el guardado fue exitoso, iniciar la descarga del ZIP
             if (data.report_id) {
                 console.log('Iniciando descarga del ZIP para el reporte:', data.report_id);
                 const exportUrl = '{{ route('reporte.export', ['report' => ':reportId']) }}'.replace(':reportId', data.report_id);
                 
-                // Crear un iframe oculto para la descarga
-                const iframe = document.createElement('iframe');
-                iframe.style.display = 'none';
-                document.body.appendChild(iframe);
+                // Crear un enlace temporal para la descarga
+                const downloadLink = document.createElement('a');
+                downloadLink.href = exportUrl;
+                downloadLink.style.display = 'none';
+                document.body.appendChild(downloadLink);
                 
                 // Iniciar la descarga
-                iframe.src = exportUrl;
+                downloadLink.click();
                 
-                // Remover el iframe después de un tiempo
+                // Remover el enlace después de un tiempo
                 setTimeout(() => {
-                    document.body.removeChild(iframe);
-                }, 5000);
+                    document.body.removeChild(downloadLink);
+                }, 1000);
 
                 // Redirigir al índice después de iniciar la descarga
                 setTimeout(() => {
-                    window.location.href = '{{ route('reporte.index') }}';
-                }, 200);
-
+                    window.location.href = data.redirect || '{{ route('reporte.index') }}';
+                }, 1000);
             } else {
+                console.error('No se recibió el ID del reporte en la respuesta:', data);
                 throw new Error('No se recibió el ID del reporte en la respuesta');
             }
         } else {
@@ -376,11 +382,12 @@ document.getElementById('saveAndExportBtn').addEventListener('click', async func
                     errorMessage += '\n- ' + data.errors[field].join(', ');
                 }
             }
+            showNotification(errorMessage, 'error');
             throw new Error(errorMessage);
         }
     } catch (error) {
         console.error('Error detallado:', error);
-        alert('Error: ' + error.message);
+        showNotification(error.message, 'error');
     } finally {
         // Re-habilitar botones
         if (saveBtn) saveBtn.disabled = false;
@@ -388,6 +395,24 @@ document.getElementById('saveAndExportBtn').addEventListener('click', async func
         saveExportBtn.textContent = '{{ isset($isEdit) ? 'Actualizar y Exportar' : 'Guardar y Exportar' }}';
     }
 });
+
+// Función para marcar archivos para eliminación
+function markForDeletion(mediaId, button) {
+    const container = button.closest('.relative.bg-zinc-700');
+    const input = container.querySelector('.delete-media-input');
+    
+    if (input.disabled) {
+        // Marcar para eliminación
+        input.disabled = false;
+        button.classList.add('bg-red-600');
+        container.classList.add('opacity-50');
+    } else {
+        // Desmarcar eliminación
+        input.disabled = true;
+        button.classList.remove('bg-red-600');
+        container.classList.remove('opacity-50');
+    }
+}
 </script>
 @endif
 @endsection

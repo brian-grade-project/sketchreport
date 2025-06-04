@@ -19,7 +19,7 @@ class MultimediaController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Multimedia::latest();
+        $query = Multimedia::where('user_id', auth()->id())->latest();
 
         if ($request->has('search')) {
             $searchTerm = $request->search;
@@ -122,7 +122,8 @@ class MultimediaController extends Controller
 
                 // Crear registro en la base de datos
                 $multimedia = Multimedia::create([
-                        'report_id' => $request->report_id, // Assuming report_id can be passed here if associated with a report
+                    'user_id' => auth()->id(),
+                    'report_id' => $request->report_id,
                     'path' => $result['path'],
                     'thumbnail' => $result['thumbnail'] ?? null,
                     'type' => $result['type'],
@@ -165,7 +166,12 @@ class MultimediaController extends Controller
      */
     public function show(Multimedia $multimedia)
     {
-        //
+        // Verificar que el archivo pertenece al usuario
+        if ($multimedia->user_id !== auth()->id()) {
+            return redirect()->route('multimedia.index')
+                ->with('error', 'No tienes permiso para ver este archivo.');
+        }
+
         return view('multimedia.show', compact('multimedia'));
     }
 
@@ -174,7 +180,12 @@ class MultimediaController extends Controller
      */
     public function edit(Multimedia $multimedia)
     {
-        //
+        // Verificar que el archivo pertenece al usuario
+        if ($multimedia->user_id !== auth()->id()) {
+            return redirect()->route('multimedia.index')
+                ->with('error', 'No tienes permiso para editar este archivo.');
+        }
+
         return view('multimedia.edit', compact('multimedia'));
     }
 
@@ -183,7 +194,13 @@ class MultimediaController extends Controller
      */
     public function update(Request $request, Multimedia $multimedia)
     {
-        //
+        // Verificar que el archivo pertenece al usuario
+        if ($multimedia->user_id !== auth()->id()) {
+            return redirect()->route('multimedia.index')
+                ->with('error', 'No tienes permiso para actualizar este archivo.');
+        }
+
+        // Implementar la lógica de actualización
     }
 
     /**
@@ -192,6 +209,12 @@ class MultimediaController extends Controller
     public function destroy(Multimedia $multimedia)
     {
         try {
+            // Verificar que el archivo pertenece al usuario
+            if ($multimedia->user_id !== auth()->id()) {
+                return redirect()->route('multimedia.index')
+                    ->with('error', 'No tienes permiso para eliminar este archivo.');
+            }
+
             // Eliminar archivos físicos
             if ($multimedia->path) {
                 Storage::disk('public')->delete($multimedia->path);
@@ -200,13 +223,14 @@ class MultimediaController extends Controller
                 Storage::disk('public')->delete($multimedia->thumbnail);
             }
 
-            // Eliminar registro
+            // Eliminar registro de la base de datos
             $multimedia->delete();
 
             return redirect()->route('multimedia.index')
                 ->with('success', 'Archivo multimedia eliminado exitosamente.');
         } catch (Exception $e) {
-            return back()->with('error', 'Error al eliminar el archivo: ' . $e->getMessage());
+            return redirect()->route('multimedia.index')
+                ->with('error', 'Error al eliminar el archivo: ' . $e->getMessage());
         }
     }
 
