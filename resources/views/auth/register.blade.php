@@ -40,9 +40,6 @@
                            id="name"
                            value="{{ old('name') }}"
                            required>
-                    @error('name')
-                        <span class="text-red-500 text-sm ml-[20%]">{{ $message }}</span>
-                    @enderror
                 </div>
 
                 <div class="inline-block ml-[8%] w-[35%]">
@@ -54,9 +51,6 @@
                            id="lastname"
                            value="{{ old('lastname') }}"
                            required>
-                    @error('lastname')
-                        <span class="text-red-500 text-sm ml-[20%]">{{ $message }}</span>
-                    @enderror
                 </div>
 
                 <div class="block ml-[5%] w-[75%]">
@@ -68,9 +62,6 @@
                            id="email"
                            value="{{ old('email') }}"
                            required>
-                    @error('email')
-                        <span class="text-red-500 text-sm ml-[20%]">{{ $message }}</span>
-                    @enderror
                 </div>
 
                 <div class="inline-block ml-[10%] w-[35%]">
@@ -81,9 +72,6 @@
                            placeholder="Ingrese contraseña" 
                            id="password"
                            required>
-                    @error('password')
-                        <span class="text-red-500 text-sm ml-[20%]">{{ $message }}</span>
-                    @enderror
                 </div>
 
                 <div class="inline-block ml-[8%] mb-[5%] w-[35%]">
@@ -106,9 +94,6 @@
                         Al crear tu cuenta estás aceptando nuestros 
                         <a class="text-orange-600 underline font-bold" href="#">términos y condiciones</a>
                     </span>
-                    @error('terms')
-                        <span class="text-red-500 text-sm block">{{ $message }}</span>
-                    @enderror
                 </div>
 
                 <button type="submit" 

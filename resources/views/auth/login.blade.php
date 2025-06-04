@@ -18,7 +18,7 @@
 
             <p class="text-center font-semibold italic m-auto mt-4 xl:mt-6 bg-orange-600 text-zinc-800">Inicia sesión e inicia una mejor gestión</p>
 
-            <form action="{{ route('login.check') }}" method="post" class="mt-8">
+            <form action="{{ route('login.check') }}" method="POST" class="mt-8">
                 @csrf
                 <div class="mb-4">
                     <label class="text-xl md:text-lg text-orange-600 block ml-28 md:ml-[25%] font-light" for="email">Usuario</label>

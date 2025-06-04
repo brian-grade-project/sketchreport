@@ -25,8 +25,8 @@
 </header>
 
 <div class="pt-16">
-    <div id="message-container" class="fixed top-0 left-0 right-0 p-4 z-50 flex justify-center pointer-events-none">
-        {{-- Messages will be inserted here --}}
+<div id="message-container" class="fixed top-0 left-0 right-0 p-4 z-50 flex justify-center pointer-events-none">
+    {{-- Messages will be inserted here --}}
     </div>
 </div>
 

@@ -7,6 +7,9 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\MultimediaController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\SearchController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PasswordController;
+use App\Http\Controllers\AccountController;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,14 +26,16 @@ Route::get('/', function () {
     return view('inicio');
 });
 
-Route::get('ingresar', [LoginController::class, 'login'])->name('login');
-Route::post('login', [LoginController::class, 'check'])->name('login.check');
-
-Route::get('/register', [RegisterController::class, 'create'])->name('register');
-Route::post('/register', [RegisterController::class, 'store'])->name('register.store');
+// Rutas para invitados (no autenticados)
+Route::middleware(['web', 'guest'])->group(function () {
+    Route::get('ingresar', [LoginController::class, 'login'])->name('login');
+    Route::post('login', [LoginController::class, 'check'])->name('login.check');
+    Route::get('/register', [RegisterController::class, 'create'])->name('register');
+    Route::post('/register', [RegisterController::class, 'store'])->name('register.store');
+});
 
 // Zona para autenticados
-Route::middleware('auth')->group(function (){
+Route::middleware(['web', 'auth'])->group(function (){
     // Inicio
     Route::get('inicio', [HomeController::class, 'inicio'])->name('home');
     
@@ -57,6 +62,17 @@ Route::middleware('auth')->group(function (){
         return view('profile.profile');
     })->name('profile');
 
+    Route::get('profile/change-password', function () {
+        return view('profile.change_password');
+    })->name('password.change');
+
     // Cerrar sesión
     Route::get('salir', [LoginController::class, 'logout'])->name('logout');
+
+    Route::post('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
+
+    Route::put('/password/update', [PasswordController::class, 'update'])->name('password.update');
+
+    // Ruta para eliminar cuenta
+    Route::post('/account/delete', [AccountController::class, 'delete'])->name('account.delete');
 });
