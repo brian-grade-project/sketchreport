@@ -108,7 +108,7 @@
 
             <a href="#" class="bg-zinc-800 text-center justify-center text-orange-600 float-left w-1/3 leading-none p-4 hover:transition-all duration-500 ease-in-out hover:text-zinc-800 hover:bg-orange-600 pointer">Contacto <br></a>
 
-            <a href="#" class="bg-orange-600 float-left w-1/3 p-4 leading-none hover:transition-all duration-500 ease-in-out hover:text-orange-600 hover:bg-zinc-800 pointer">Acerca de nosotros</a>
+            <a href="{{ route('about') }}" class="bg-orange-600 float-left w-1/3 p-4 leading-none hover:transition-all duration-500 ease-in-out hover:text-orange-600 hover:bg-zinc-800 pointer">Acerca de nosotros</a>
         
 
             <img src="/img/logotipo3.svg" class="w-4/12  m-auto lg:pt-20 md:pt-10 xl:pt-20 xl:pb-20" ></img>

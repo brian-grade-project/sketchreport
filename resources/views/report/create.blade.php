@@ -271,7 +271,7 @@ function handleFiles(e) {
     }
 
     const previewContainer = document.getElementById('previewContainer');
-    
+
     // Remover solo el botón de agregar si existe
     const addButton = previewContainer.querySelector('.relative.bg-zinc-700.rounded-lg.p-2:last-child');
     if (addButton) {

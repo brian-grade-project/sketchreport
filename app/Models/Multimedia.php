@@ -13,7 +13,6 @@ class Multimedia extends Model
     protected $table = 'multimedias';
 
     protected $fillable = [
-        'user_id',
         'report_id',
         'path',
         'thumbnail',
@@ -27,11 +26,6 @@ class Multimedia extends Model
         'media_date' => 'date',
         'metadata' => 'array'
     ];
-
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
 
     public function report()
     {

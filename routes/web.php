@@ -34,6 +34,11 @@ Route::get('/register', [RegisterController::class, 'create'])->name('register')
 Route::post('/register', [RegisterController::class, 'store'])->name('register.store');
 });
 
+// Acerca de nosotros (Accesible a todos)
+Route::get('about', function () {
+    return view('about');
+})->name('about');
+
 // Zona para autenticados
 Route::middleware(['web', 'auth'])->group(function (){
     // Inicio

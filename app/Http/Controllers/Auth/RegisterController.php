@@ -34,10 +34,10 @@ class RegisterController extends Controller
     public function store(Request $request)
     {
         try {
-            $request->validate([
-                'name' => 'required|string|max:255',
-                'lastname' => 'required|string|max:255',
-                'email' => 'required|string|email|max:255|unique:users',
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'lastname' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
                 'password' => [
                     'required',
                     'string',
@@ -46,34 +46,34 @@ class RegisterController extends Controller
                     'regex:/[A-Z]/', // Al menos una letra mayúscula
                     'regex:/[!@#$%^&*(),.?":{}|<>]/', // Al menos un carácter especial
                 ],
-                'terms' => 'required'
-            ], [
-                'name.required' => 'El nombre es obligatorio',
-                'lastname.required' => 'Los apellidos son obligatorios',
-                'email.required' => 'El correo electrónico es obligatorio',
-                'email.email' => 'El correo electrónico debe ser válido',
-                'email.unique' => 'Este correo electrónico ya está registrado',
-                'password.required' => 'La contraseña es obligatoria',
-                'password.min' => 'La contraseña debe tener al menos 8 caracteres',
-                'password.confirmed' => 'Las contraseñas no coinciden',
+            'terms' => 'required'
+        ], [
+            'name.required' => 'El nombre es obligatorio',
+            'lastname.required' => 'Los apellidos son obligatorios',
+            'email.required' => 'El correo electrónico es obligatorio',
+            'email.email' => 'El correo electrónico debe ser válido',
+            'email.unique' => 'Este correo electrónico ya está registrado',
+            'password.required' => 'La contraseña es obligatoria',
+            'password.min' => 'La contraseña debe tener al menos 8 caracteres',
+            'password.confirmed' => 'Las contraseñas no coinciden',
                 'password.regex' => 'La contraseña debe contener al menos una letra mayúscula y un carácter especial (!@#$%^&*(),.?":{}|<>)',
-                'terms.required' => 'Debes aceptar los términos y condiciones'
-            ]);
+            'terms.required' => 'Debes aceptar los términos y condiciones'
+        ]);
 
-            // Generar username basado en el email
-            $username = Str::before($request->email, '@');
+        // Generar username basado en el email
+        $username = Str::before($request->email, '@');
 
-            $user = User::create([
-                'name' => $request->name,
-                'lastname' => $request->lastname,
-                'email' => $request->email,
-                'username' => $username,
-                'password' => Hash::make($request->password),
-            ]);
+        $user = User::create([
+            'name' => $request->name,
+            'lastname' => $request->lastname,
+            'email' => $request->email,
+            'username' => $username,
+            'password' => Hash::make($request->password),
+        ]);
 
-            Auth::login($user);
+        Auth::login($user);
 
-            return redirect()->route('home')->with('success', '¡Cuenta creada exitosamente!');
+        return redirect()->route('home')->with('success', '¡Cuenta creada exitosamente!');
         } catch (\Illuminate\Validation\ValidationException $e) {
             return back()
                 ->withInput()

@@ -17,22 +17,22 @@
                     <a href="{{ route('reporte.create') }}" class="bg-zinc-800 text-orange-600 px-4 py-2 rounded-full hover:bg-zinc-700 transition-colors duration-200">Crear reporte</a>
                     <a href="{{ route('reporte.index') }}" class="bg-zinc-800 text-orange-600 px-4 py-2 rounded-full hover:bg-zinc-700 transition-colors duration-200">Ver todos mis reportes</a>
                 </div>
-            </div>
+        </div>
             <div class="bg-zinc-800 rounded-lg p-4">
                 <table class="w-full border-separate border-spacing-1">
-                    <thead>
-                        <tr>
+            <thead>
+                <tr>
                             <th class="text-orange-600 p-2 text-left bg-zinc-700">Título</th>
                             <th class="text-orange-600 p-2 text-left bg-zinc-700">Fecha</th>
                             <th class="text-orange-600 p-2 text-left bg-zinc-700">Archivos</th>
                             <th class="text-orange-600 p-2 text-left bg-zinc-700">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if($reportes->count())
-                            @foreach($reportes as $reporte)
-                                <tr class="group">
-                                    <td class="text-orange-600 p-2 bg-zinc-700 group-hover:bg-zinc-600 transition-colors duration-200">{{ $reporte->title }}</td>
+                </tr>
+            </thead>
+            <tbody>
+                @if($reportes->count())
+                  @foreach($reportes as $reporte)
+                            <tr class="group">
+                                <td class="text-orange-600 p-2 bg-zinc-700 group-hover:bg-zinc-600 transition-colors duration-200">{{ $reporte->title }}</td>
                                     <td class="text-orange-600 p-2 bg-zinc-700 group-hover:bg-zinc-600 transition-colors duration-200">{{ $reporte->report_date->format('d/m/Y') }}</td>
                                     <td class="text-orange-600 p-2 bg-zinc-700 group-hover:bg-zinc-600 transition-colors duration-200">
                                         @if($reporte->media_files->count() > 0)
@@ -62,15 +62,15 @@
                                             </form>
                                         </div>
                                     </td>
-                                </tr>
-                            @endforeach
-                        @else
-                            <tr>
+                    </tr>
+                  @endforeach
+                @else
+                  <tr>
                                 <td colspan="4" class="text-orange-600 p-2 text-center bg-zinc-700">No has creado ningún reporte aún</td>
-                            </tr>
-                        @endif
-                    </tbody>
-                </table>
+                  </tr>
+                @endif
+            </tbody>
+        </table>
             </div>
         </div>
     </div>
@@ -86,21 +86,21 @@
                     <a href="{{ route('multimedia.create') }}" class="bg-zinc-800 text-orange-600 px-4 py-2 rounded-full hover:bg-zinc-700 transition-colors duration-200">Agregar archivo multimedia</a>
                     <a href="{{ route('multimedia.index') }}" class="bg-zinc-800 text-orange-600 px-4 py-2 rounded-full hover:bg-zinc-700 transition-colors duration-200">Ver todos mis archivos</a>
                 </div>
-            </div>
+        </div>
             <div class="bg-zinc-800 rounded-lg p-4">
                 <table class="w-full border-separate border-spacing-1">
-                    <thead>
-                        <tr>
+            <thead>
+                <tr>
                             <th class="text-orange-600 p-2 text-left bg-zinc-700">Nombre</th>
                             <th class="text-orange-600 p-2 text-left bg-zinc-700">Tipo</th>
                             <th class="text-orange-600 p-2 text-left bg-zinc-700">Fecha</th>
                             <th class="text-orange-600 p-2 text-left bg-zinc-700">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if($multimedias->count())
-                            @foreach($multimedias as $multimedia)
-                                <tr class="group">
+                </tr>
+            </thead>
+            <tbody>
+                @if($multimedias->count())
+                @foreach($multimedias as $multimedia)
+                      <tr class="group">
                                     <td class="text-orange-600 p-2 bg-zinc-700 group-hover:bg-zinc-600 transition-colors duration-200">
                                         {{ $multimedia->text ?: pathinfo($multimedia->path, PATHINFO_FILENAME) }}
                                     </td>
@@ -132,18 +132,18 @@
                                             </form>
                                         </div>
                                     </td>
-                                </tr>
-                            @endforeach
-                        @else
-                            <tr>
+                  </tr>
+                @endforeach
+              @else
+                <tr>
                                 <td colspan="4" class="text-orange-600 p-2 text-center bg-zinc-700">No has subido ningún archivo multimedia aún</td>
-                            </tr>
-                        @endif
-                    </tbody>
-                </table>
-            </div>
+                </tr>
+              @endif
+            </tbody>
+        </table>
         </div>
     </div>
+</div>
 </div>
 
 <!-- Diálogo de confirmación para reportes -->

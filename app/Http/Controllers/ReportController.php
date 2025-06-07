@@ -225,7 +225,7 @@ class ReportController extends Controller
 
         try {
             $reporte = Report::findOrFail($id);
-
+            
             // Verificar que el reporte pertenece al usuario
             if ($reporte->user_id !== auth()->id()) {
                 return redirect()->route('reporte.index')
@@ -285,7 +285,7 @@ class ReportController extends Controller
                 ->with('success', 'Reporte actualizado exitosamente');
         } catch (\Exception $e) {
             \Log::error('Error en update method: ' . $e->getMessage());
-            
+
             if ($request->wantsJson()) {
                 return response()->json([
                     'success' => false,
@@ -312,7 +312,7 @@ class ReportController extends Controller
                 return redirect()->route('reporte.index')
                     ->with('error', 'No tienes permiso para eliminar este reporte.');
             }
-
+            
             // Eliminar archivos multimedia asociados
             foreach ($reporte->media_files as $media) {
                 if (Storage::exists('public/' . $media->file_path)) {
@@ -320,10 +320,10 @@ class ReportController extends Controller
                 }
                 $media->delete();
             }
-
+            
             // Eliminar el reporte
             $reporte->delete();
-
+            
             return redirect()->route('reporte.index')
                 ->with('success', 'Reporte eliminado exitosamente');
         } catch (\Exception $e) {

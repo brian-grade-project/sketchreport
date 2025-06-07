@@ -47,7 +47,9 @@
         <div class="w-[30%] h-[97%] bg-orange-600 rounded-3xl pt-[0.5%] float-left mr-5 ">
 
         <div class=" w-[15%] h-[2%] md:h-[1%]   mb-8 md:mt-1 ml-5">
-          <svg class="w-[65%] md:w-[75%] xl:w-[65%] 2xl:w-[60%] fill-zinc-800 hover:bg-zinc-800 hover:fill-orange-600 transition-all duration-500 ease-in-out rounded-full" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g id="arrow-left"><path d="M11,18.75a.74.74,0,0,1-.53-.22l-6-6a.75.75,0,0,1,0-1.06l6-6a.75.75,0,0,1,1.06,1.06L6.06,12l5.47,5.47a.75.75,0,0,1,0,1.06A.74.74,0,0,1,11,18.75Z"/><path d="M19,12.75H5a.75.75,0,0,1,0-1.5H19a.75.75,0,0,1,0,1.5Z"/></g></svg>
+          <a href="{{ route('home') }}" class="block">
+            <svg class="w-[65%] md:w-[75%] xl:w-[65%] 2xl:w-[60%] fill-zinc-800 hover:bg-zinc-800 hover:fill-orange-600 transition-all duration-500 ease-in-out rounded-full" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g id="arrow-left"><path d="M11,18.75a.74.74,0,0,1-.53-.22l-6-6a.75.75,0,0,1,0-1.06l6-6a.75.75,0,0,1,1.06,1.06L6.06,12l5.47,5.47a.75.75,0,0,1,0,1.06A.74.74,0,0,1,11,18.75Z"/><path d="M19,12.75H5a.75.75,0,0,1,0-1.5H19a.75.75,0,0,1,0,1.5Z"/></g></svg>
+          </a>
         </div>
 
             <div class="w-[85%] h-[88%] m-auto bg-zinc-800 rounded-3xl shadow-xl/30 pt-8 flex flex-col justify-center items-center">
