@@ -54,8 +54,8 @@
 
             <img src="/img/img2.png" class="lg:h-full md:h-[90%] md:w-[38%] cover float-right lg:mr-10 md:mr-5" alt="Imagen 2"></img>
         </div>
-
-        <!--tercera vision-->
+        
+         <!--tercera vision-->
         <div class="bg-zinc-800 w-screen h-screen relative">
             <p class="lg:text-2xl md:text-xl text-orange-600 text-left float-left lg:max-w-xl md:w-[60%] leading-none font-bold italic absolute top-12 left-7">
                Nuestra aplicación está diseñada para asegurar tu comodidad y acceso en todo momento
@@ -73,7 +73,7 @@
 
             <a class="text-orange-600 text-center leading-none lg:text-3xl md:text-2xl absolute lg:top-3/4 md:top-[73%] xl:top-[73%] lg:left-52 md:left-[16%] hover:transition-all duration-500 ease-in-out hover:text-zinc-800 hover:bg-orange-600 pointer rounded-full px-5 py-10 mb-5" href="{{ route('login') }}">Inicia<br> <b>AHORA</b></a>
         </div>
-
+            
         <!--cuarta vision-->   
         <div id="enlaces" class="w-screen lg:h-60 md:h-40 xl:h-[50%] bg-zinc-800 lg:text-3xl md:text-xl text-center font-bold italic">
             <a href="#" class="bg-orange-600 float-left w-1/3 p-4 leading-none hover:transition-all duration-500 ease-in-out hover:text-orange-600 hover:bg-zinc-800 pointer">Políticas y condiciones</a>
@@ -81,7 +81,7 @@
             <a href="{{ route('about') }}#contacto" class="bg-zinc-800 text-center justify-center text-orange-600 float-left w-1/3 leading-none p-4 hover:transition-all duration-500 ease-in-out hover:text-zinc-800 hover:bg-orange-600 pointer">Contacto <br></a>
 
             <a href="{{ route('about') }}" class="bg-orange-600 float-left w-1/3 p-4 leading-none hover:transition-all duration-500 ease-in-out hover:text-orange-600 hover:bg-zinc-800 pointer">Acerca de nosotros</a>
-
+        
             <img src="/img/logotipo3.svg" class="w-4/12 m-auto lg:pt-20 md:pt-10 xl:pt-20 xl:pb-20" alt="Logo 3"></img>
         </div>
     </div>

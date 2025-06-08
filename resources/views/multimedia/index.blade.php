@@ -76,7 +76,7 @@
           <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 fill-orange-500 absolute right-4 top-1/2 -translate-y-1/2" viewBox="0 0 24 24"><g id="search"><path d="M10.77,18.3a7.53,7.53,0,1,1,7.53-7.53A7.53,7.53,0,0,1,10.77,18.3Zm0-13.55a6,6,0,1,0,6,6A6,6,0,0,0,10.77,4.75Z"/><path d="M20,20.75a.74.74,0,0,1-.53-.22L15.34,16.4a.75.75,0,0,1,1.06-1.06l4.13,4.13a.75.75,0,0,1,0,1.06A.74.74,0,0,1,20,20.75Z"/></g></svg>
         </div>
         <div class="relative inline-flex items-center">
-          <button class="bg-zinc-800 rounded-full w-24 h-10 p-2 inline-flex items-center justify-center gap-1">
+          <button class="bg-zinc-800 rounded-full w-24 h-10 p-2 inline-flex items-center justify-center gap-1 filter-btn">
             <svg class="w-6 h-6 fill-orange-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g id="filter-fill"><path d="M20.17,3.91a.76.76,0,0,0-.67-.41H4.5a.76.76,0,0,0-.67.41.73.73,0,0,0,.07.78L9.25,12v7.75a.76.76,0,0,0,.75.75h4a.76.76,0,0,0,.75-.75V12L20.1,4.69A.73.73,0,0,0,20.17,3.91Z"/></g></svg>
             <svg class="w-6 h-6 fill-orange-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g id="angle-down"><path d="M12,14.5a.74.74,0,0,1-.53-.22L8,10.78A.75.75,0,0,1,9,9.72l3,3,3-3A.75.75,0,0,1,16,10.78l-3.5,3.5A.74.74,0,0,1,12,14.5Z"/></g></svg>
           </button>
@@ -255,7 +255,7 @@
         });
 
         // Función para mostrar/ocultar el dropdown
-        document.querySelector('button').addEventListener('click', function(e) {
+        document.querySelector('.filter-btn').addEventListener('click', function(e) {
             e.stopPropagation();
             const dropdownContent = document.getElementById('dropdown-content');
             dropdownContent.classList.toggle('opacity-0');
@@ -285,20 +285,39 @@
         // Función de filtrado
         function filterTable(type) {
             const rows = document.querySelectorAll('#multimedia-list tr:not(.add-row)');
-            rows.forEach(row => {
-                const cell = row.querySelector(`td:nth-child(${type === 'name' ? 1 : type === 'date' ? 2 : 3})`);
-                if (cell) {
-                    row.style.display = '';
+            const tbody = document.getElementById('multimedia-list');
+            const sortedRows = Array.from(rows).sort((a, b) => {
+                const aValue = a.querySelector(`td:nth-child(${type === 'name' ? 1 : type === 'date' ? 2 : 3})`).textContent.trim();
+                const bValue = b.querySelector(`td:nth-child(${type === 'name' ? 1 : type === 'date' ? 2 : 3})`).textContent.trim();
+                
+                if (type === 'date') {
+                    return new Date(aValue) - new Date(bValue);
                 }
+                return aValue.localeCompare(bValue);
             });
+
+            // Remove existing rows
+            rows.forEach(row => row.remove());
+            
+            // Add sorted rows
+            sortedRows.forEach(row => tbody.appendChild(row));
         }
 
         // Función para resetear la tabla
         function resetTable() {
             const rows = document.querySelectorAll('#multimedia-list tr:not(.add-row)');
-            rows.forEach(row => {
-                row.style.display = '';
+            const tbody = document.getElementById('multimedia-list');
+            const sortedRows = Array.from(rows).sort((a, b) => {
+                const aId = parseInt(a.dataset.id);
+                const bId = parseInt(b.dataset.id);
+                return bId - aId; // Sort by ID in descending order (newest first)
             });
+
+            // Remove existing rows
+            rows.forEach(row => row.remove());
+            
+            // Add sorted rows
+            sortedRows.forEach(row => tbody.appendChild(row));
         }
   </script>
 </body>

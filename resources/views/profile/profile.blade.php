@@ -55,9 +55,13 @@
             <div class="w-[85%] h-[88%] m-auto bg-zinc-800 rounded-3xl shadow-xl/30 pt-8 flex flex-col justify-center items-center">
                 <p class="text-orange-600 text-3xl font-bold text-center mb-4 ">Mi Perfil</p>
 
-                <div class="w-40 h-40 bg-orange-600 m-auto rounded-full">
-
-
+                <div class="w-40 h-40 bg-orange-600 m-auto rounded-full flex items-center justify-center">
+                    <svg class="w-24 h-24 fill-zinc-800" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <g id="user">
+                            <path d="M12,12.25A3.75,3.75,0,1,1,15.75,8.5,3.75,3.75,0,0,1,12,12.25Zm0-6A2.25,2.25,0,1,0,14.25,8.5,2.25,2.25,0,0,0,12,6.25Z"/>
+                            <path d="M19,19.25a.76.76,0,0,1-.75-.75c0-1.95-1.06-3.25-6.25-3.25s-6.25,1.3-6.25,3.25a.75.75,0,0,1-1.5,0c0-4.75,5.43-4.75,7.75-4.75s7.75,0,7.75,4.75A.76.76,0,0,1,19,19.25Z"/>
+                        </g>
+                    </svg>
                 </div>
 
                 <p class="bg-orange-600 p-2 rounded-full text-xl font-bold mt-3 mb-3">{{ auth()->user()->username }}</p>
