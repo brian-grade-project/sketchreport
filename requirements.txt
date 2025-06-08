@@ -11,6 +11,10 @@ SketchReport es una aplicación web desarrollada en Laravel que permite gestiona
 - Dashboard con vista de últimos reportes y archivos multimedia
 - Perfil de usuario con gestión de información personal
 - Sistema de suscripciones
+- Sistema de búsqueda global
+- Filtrado de reportes y multimedia
+- Gestión de teléfono en perfil de usuario
+- Modal de confirmación para eliminación de cuenta
 
 ## Requisitos del Sistema
 - PHP >= 8.1
@@ -24,65 +28,80 @@ SketchReport es una aplicación web desarrollada en Laravel que permite gestiona
 ### Funcionalidades
 1. Gestión de Multimedia
    - [x] Implementar validación de archivos multimedia
+   - [x] Implementar vista previa de archivos multimedia
+   - [x] Implementar filtrado de archivos multimedia
    - Agregar soporte para diferentes tipos de archivos
-   - Implementar vista previa de archivos multimedia
    - Completar funcionalidad de exportación de archivos
 
 2. Sistema de Reportes
-   - Implementar filtros avanzados en la lista de reportes
-   - Agregar funcionalidad de búsqueda
+   - [x] Implementar filtros en la lista de reportes
+   - [x] Agregar funcionalidad de búsqueda
    - Implementar sistema de categorías para reportes
    - Agregar funcionalidad de compartir reportes
 
 3. Perfil de Usuario
-   - Implementar cambio de contraseña
-   - Agregar validación de campos del perfil
+   - [x] Implementar cambio de contraseña
+   - [x] Agregar validación de campos del perfil
+   - [x] Implementar gestión de teléfono
    - Implementar subida de foto de perfil
    - Agregar historial de actividades
 
 4. Sistema de Suscripciones
+   - [x] Implementar visualización de estado de suscripción
+   - [x] Implementar visualización de plan actual
    - Implementar diferentes planes de suscripción
    - Agregar sistema de pagos
    - Implementar renovación automática
    - Agregar notificaciones de vencimiento
 
 5. Seguridad
+   - [x] Implementar autenticación básica
+   - [x] Agregar validación de datos
+   - [x] Implementar confirmación para acciones críticas
    - Implementar autenticación de dos factores
    - Agregar registro de actividad de usuarios
    - Implementar políticas de contraseñas
    - Agregar sistema de recuperación de contraseña
 
 6. Interfaz de Usuario
-   - Mejorar la responsividad en dispositivos móviles
+   - [x] Implementar diseño responsivo
+   - [x] Agregar mensajes de retroalimentación
+   - [x] Implementar modales de confirmación
+   - [x] Mejorar la navegación
    - Implementar temas oscuro/claro
    - Agregar animaciones y transiciones
    - Mejorar la accesibilidad
 
 ### Correcciones Técnicas
 1. Base de Datos
+   - [x] Implementar migraciones para nuevos campos
+   - [x] Agregar campo de teléfono a usuarios
    - Optimizar índices de tablas
    - Implementar soft deletes
    - Agregar relaciones faltantes
    - Implementar caché de consultas frecuentes
 
 2. Backend
-   - Implementar validación de datos
-   - Agregar manejo de errores
+   - [x] Implementar validación de datos
+   - [x] Agregar manejo de errores
+   - [x] Implementar mensajes de retroalimentación
    - Implementar logs del sistema
    - Optimizar consultas a la base de datos
 
 3. Frontend
+   - [x] Implementar diseño responsivo
+   - [x] Optimizar carga de assets
    - Implementar lazy loading de imágenes
-   - Optimizar carga de assets
    - Implementar PWA
    - Mejorar SEO
 
 ## Prioridades de Implementación
 1. Alta Prioridad
    - [x] Implementar validación de archivos multimedia
-   - Completar funcionalidad de cambio de contraseña
-   - Implementar filtros y búsqueda en reportes
-   - Agregar manejo de errores y validación de datos
+   - [x] Completar funcionalidad de cambio de contraseña
+   - [x] Implementar filtros y búsqueda en reportes
+   - [x] Agregar manejo de errores y validación de datos
+   - [x] Implementar gestión de teléfono en perfil
 
 2. Media Prioridad
    - Implementar sistema de categorías para reportes

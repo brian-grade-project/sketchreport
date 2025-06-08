@@ -144,21 +144,12 @@
             <div class="w-[100%] h-[30%] bg-zinc-800 rounded-3xl mb-2 p-5">
 
                 <p class="text-orange-600 font-bold text-2xl">ELIMINAR CUENTA:</p>
-                <p class="text-orange-600 font-regular text-base/5 md:mt-2">Esta sección permite eliminar o deshabilitar tu cuenta en nuestra aplicación. Si eliges eliminar tu cuenta, toda tu información será eliminada de nuestra base de datos de forma definitiva.</p>
-                <div class="relative block  mt-5 ml-2 lg:w-[32%] md:w-[25%] rounded-full inline-block ">
-                    <button class="btn-sm text-center bg-orange-600 w-full rounded-full text-xl font-light h-full hover:bg-orange-700 hover:text-white hover:font-semibold">Desactivar Cuenta</button>
-                </div>
-
-                <div class="relative block  mt-5 ml-16 lg:w-[30%] md:w-[25%] rounded-full inline-block">
+                <p class="text-orange-600 font-regular text-base/5 md:mt-2">Esta sección permite eliminar tu cuenta en nuestra aplicación. Si eliges eliminar tu cuenta, toda tu información será eliminada de nuestra base de datos de forma definitiva.</p>
+                <div class="relative block mt-5 ml-2 lg:w-[32%] md:w-[25%] rounded-full inline-block">
                     <button onclick="showDeleteModal()" class="btn-sm text-center bg-orange-600 w-full rounded-full text-xl font-light h-full hover:bg-orange-700 hover:text-white hover:font-semibold">Eliminar Cuenta</button>
                 </div>
 
             </div>
-
-            <div class="relative block  mt-2 ml-20 float-right lg:w-[28%] md:w-[25%] rounded-full inline-block">
-                    <button class=" p-2 btn-sm text-center text-orange-600 bg-zinc-800 w-full rounded-full text-xl font-light h-full hover:bg-orange-700 hover:text-white hover:font-semibold">Guardar Cambios</button>
-
-                </div>
 
         </div>
 

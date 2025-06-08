@@ -13,6 +13,7 @@ class Multimedia extends Model
     protected $table = 'multimedias';
 
     protected $fillable = [
+        'user_id',
         'report_id',
         'path',
         'thumbnail',
@@ -30,6 +31,11 @@ class Multimedia extends Model
     public function report()
     {
         return $this->belongsTo(Report::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 
     public function getThumbnailUrlAttribute()

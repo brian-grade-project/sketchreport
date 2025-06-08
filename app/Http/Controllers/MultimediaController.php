@@ -122,7 +122,8 @@ class MultimediaController extends Controller
 
                 // Crear registro en la base de datos
                 $multimedia = Multimedia::create([
-                        'report_id' => $request->report_id, // Assuming report_id can be passed here if associated with a report
+                    'user_id' => auth()->id(),
+                    'report_id' => $request->report_id, // Assuming report_id can be passed here if associated with a report
                     'path' => $result['path'],
                     'thumbnail' => $result['thumbnail'] ?? null,
                     'type' => $result['type'],

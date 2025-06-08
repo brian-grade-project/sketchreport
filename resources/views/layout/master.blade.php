@@ -10,12 +10,18 @@
         <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
     </head>
     <body>
-        @include('layout.header')
+        @auth
+            @include('layout.header')
+        @endauth
         <main>
-            @include('layout.sidebar')
+            @auth
+                @include('layout.sidebar')
+            @endauth
             @yield('content')
         </main>
-        @include('layout.footer')
+        @auth
+            @include('layout.footer')
+        @endauth
 
         <!-- Contenedor de mensajes -->
         <div id="successMessage" class="fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg hidden"></div>
