@@ -264,11 +264,13 @@ document.addEventListener('DOMContentLoaded', function() {
     // Funciones para el modal de eliminación de cuenta
     window.showDeleteModal = function() {
         document.getElementById('deleteAccountModal').classList.remove('hidden');
-    }
+        document.getElementById('deleteAccountModal').classList.add('flex');
+    };
 
     window.closeDeleteModal = function() {
         document.getElementById('deleteAccountModal').classList.add('hidden');
-    }
+        document.getElementById('deleteAccountModal').classList.remove('flex');
+    };
 
     // Manejar el envío del formulario de eliminación
     document.getElementById('deleteAccountForm').addEventListener('submit', function(e) {
@@ -279,7 +281,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Cerrar modal al hacer clic fuera de él
+    // Cerrar el modal si se hace clic fuera de él
     document.getElementById('deleteAccountModal').addEventListener('click', function(e) {
         if (e.target === this) {
             closeDeleteModal();
